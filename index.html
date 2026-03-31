@@ -1344,7 +1344,7 @@ footer {
       <p class="section-desc reveal" style="margin-bottom:28px">
         Our flagship 8-week faith-integrated fitness program. Build strength, endurance, and spiritual discipline — simultaneously. Instant digital download.
       </p>
-      <button class="btn-xl btn-xl-white reveal" onclick="addToCartById('temple-strong')">Get the Program — $47.00</button>
+      <button class="btn-xl btn-xl-white reveal" onclick="addToCartById('bodyweight-program')">Get the Program — $27.00</button>
       <div class="callout-metrics reveal">
         <div class="metric"><div class="metric-val">500+</div><div class="metric-label">Women enrolled</div></div>
         <div class="metric"><div class="metric-val">8wk</div><div class="metric-label">Training program</div></div>
@@ -1537,12 +1537,6 @@ footer {
    STORE STATE
 ═══════════════════════════════════════════ */
 const DEFAULT_PRODUCTS = [
-  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25' },
-  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'', tag:'', verse:'Daily scripture, reflection, and wellness prompts.' },
-  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'', tag:'digital', verse:'Faith-integrated training combining strength and scripture.' },
-  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10' },
-  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'', tag:'', verse:'Track habits, prayers, workouts, and scripture.' },
-  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.' },
   { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg' },
   { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg' },
   { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg' },
@@ -1561,6 +1555,17 @@ const DEFAULT_PRODUCTS = [
   { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg' },
   { id:'dcul-womens', name:'DC-UL 1.0 — Women\'s Edition', cat:'digital', price:39, emoji:'', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg' },
 ];
+const PRODUCT_STORAGE_KEY = 'vv_products';
+const PRODUCT_MIGRATION_KEY = 'vv_products_global_v2';
+const REMOVED_PRODUCT_IDS = new Set([
+  'grace-leggings',
+  'renew-devotional',
+  'temple-strong',
+  'stillwater-bra',
+  'wellness-planner',
+  'soul-sweat',
+]);
+let productsCache = DEFAULT_PRODUCTS.map(normalizeProduct);
 
 function normalizeProduct(product) {
   const mediaUrls = (product.mediaUrls || []).filter(Boolean);
@@ -1573,32 +1578,54 @@ function normalizeProduct(product) {
   };
 }
 
-function migrateProductEmojis(products) {
-  return products.map(product => normalizeProduct({ ...product, emoji: '' }));
+function migrateProducts(products) {
+  return products
+    .filter(product => !REMOVED_PRODUCT_IDS.has(product.id))
+    .map(product => normalizeProduct({ ...product, emoji: '' }));
+}
+
+async function readSharedProducts() {
+  try {
+    const record = await window.storage.get(PRODUCT_STORAGE_KEY);
+    return record?.value ? JSON.parse(record.value) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeProductsToStores(products) {
+  const serialized = JSON.stringify(products);
+  productsCache = products.map(normalizeProduct);
+  localStorage.setItem(PRODUCT_STORAGE_KEY, serialized);
+  localStorage.setItem(PRODUCT_MIGRATION_KEY, '1');
+  try { await window.storage.set(PRODUCT_STORAGE_KEY, serialized, true); } catch {}
+}
+
+async function initializeProductsStore() {
+  let products = await readSharedProducts();
+  if (!Array.isArray(products) || products.length === 0) {
+    try {
+      const local = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY) || 'null');
+      if (Array.isArray(local) && local.length) products = local;
+    } catch {}
+  }
+  const baseProducts = Array.isArray(products) && products.length ? products : DEFAULT_PRODUCTS;
+  const migrated = migrateProducts(baseProducts);
+  const changed = !Array.isArray(products)
+    || products.length !== migrated.length
+    || products.some((product, index) => JSON.stringify(product) !== JSON.stringify(migrated[index]));
+  if (changed || !localStorage.getItem(PRODUCT_MIGRATION_KEY)) {
+    await writeProductsToStores(migrated);
+  } else {
+    productsCache = migrated.map(normalizeProduct);
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(migrated));
+    localStorage.setItem(PRODUCT_MIGRATION_KEY, '1');
+  }
+  return productsCache;
 }
 
 function getProducts() {
-  try {
-    const s = localStorage.getItem('vv_products');
-    if (!s) {
-      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return DEFAULT_PRODUCTS.map(normalizeProduct);
-    }
-    const parsed = JSON.parse(s);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return DEFAULT_PRODUCTS.map(normalizeProduct);
-    }
-    if (!localStorage.getItem('vv_products_emojis_removed_v1')) {
-      const migrated = migrateProductEmojis(parsed);
-      localStorage.setItem('vv_products', JSON.stringify(migrated));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return migrated;
-    }
-    return parsed.map(normalizeProduct);
-  } catch { return DEFAULT_PRODUCTS.map(normalizeProduct); }
+  return productsCache;
 }
 
 // PIF state via Artifact Storage + localStorage fallback
@@ -2030,8 +2057,15 @@ function syncPifFromStorage(event) {
   updatePifStat();
 }
 
+async function refreshProductsFromSharedStore() {
+  await initializeProductsStore();
+  renderProducts('all');
+  initLazyImages();
+}
+
 /* ─── INIT ─── */
 window.addEventListener('DOMContentLoaded', async () => {
+  await initializeProductsStore();
   renderProducts('all');
   initLazyImages();
   setTimeout(() => {
@@ -2042,6 +2076,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   }, 0);
 });
 window.addEventListener('storage', syncPifFromStorage);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshProductsFromSharedStore();
+});
 window.addEventListener('keydown', (event) => {
   if (!document.getElementById('galleryOverlay').classList.contains('open')) return;
   if (event.key === 'Escape') closeProductGallery();

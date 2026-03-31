@@ -19,6 +19,7 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{font-size:16px}
 body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;min-height:100vh}
+body.auth-locked{overflow:hidden}
 button{cursor:pointer;font-family:inherit}
 a{text-decoration:none;color:inherit}
 ::-webkit-scrollbar{width:4px}
@@ -26,6 +27,26 @@ a{text-decoration:none;color:inherit}
 ::-webkit-scrollbar-thumb{background:var(--grey-2);border-radius:2px}
 
 /* ─── LAYOUT ─── */
+.auth-screen{
+  position:fixed;inset:0;z-index:500;
+  background:
+    radial-gradient(circle at top, rgba(201,169,110,0.12), transparent 35%),
+    var(--black);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+}
+.auth-screen.hidden{display:none}
+.auth-card{
+  width:100%;max-width:380px;
+  background:var(--black-2);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:28px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.45);
+}
+.auth-title{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:8px}
+.auth-sub{font-size:0.82rem;color:var(--grey-4);margin-bottom:20px;line-height:1.7}
+.auth-error{min-height:18px;font-size:0.78rem;color:#ff8a80;margin-top:10px}
+.admin-layout.hidden{display:none}
 .admin-layout{display:flex;min-height:100vh}
 .sidebar{
   width:240px;flex-shrink:0;
@@ -342,9 +363,26 @@ a{text-decoration:none;color:inherit}
 }
 </style>
 </head>
-<body>
+<body class="auth-locked">
 
 <div class="notif" id="notif"></div>
+
+<div class="auth-screen" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-title">Admin Login</div>
+    <div class="auth-sub">Enter your admin credentials to manage products and Pay it Forward.</div>
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <input class="form-input" id="loginUser" autocomplete="username" value="admin">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" id="loginPass" type="password" autocomplete="current-password" placeholder="Enter password" onkeydown="if(event.key==='Enter') loginAdmin()">
+    </div>
+    <button class="btn-sm btn-sm-white" style="width:100%;height:40px" onclick="loginAdmin()">Enter Admin</button>
+    <div class="auth-error" id="authError"></div>
+  </div>
+</div>
 
 <!-- Delete Confirm Modal -->
 <div class="confirm-modal" id="confirmModal">
@@ -374,7 +412,7 @@ a{text-decoration:none;color:inherit}
   </div>
 </div>
 
-<div class="admin-layout">
+<div class="admin-layout hidden" id="adminLayout">
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">Virtue <span>&</span> Vitality<br><span style="font-family:'Inter',sans-serif;font-size:0.68rem;color:var(--grey-4);font-weight:300">Admin Panel</span></div>
@@ -518,12 +556,6 @@ a{text-decoration:none;color:inherit}
    ADMIN STATE
 ═══════════════════════════════════════════ */
 const DEFAULT_PRODUCTS = [
-  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25', active:true },
-  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'', tag:'', verse:'Daily scripture, reflection, and wellness prompts.', active:true },
-  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'', tag:'digital', verse:'Faith-integrated training combining strength and scripture.', active:true },
-  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10', active:true },
-  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'', tag:'', verse:'Track habits, prayers, workouts, and scripture.', active:true },
-  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.', active:true },
   { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg', mediaUrls:['images/IMG_4602.jpeg'], active:true },
   { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg', mediaUrls:['images/IMG_4603.jpeg'], active:true },
   { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg', mediaUrls:['images/IMG_4604.jpeg'], active:true },
@@ -542,6 +574,17 @@ const DEFAULT_PRODUCTS = [
   { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg', mediaUrls:['images/IMG_4620.jpeg'], active:true },
   { id:'dcul-womens', name:"DC-UL 1.0 — Women's Edition", cat:'digital', price:39, emoji:'', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg', mediaUrls:['images/IMG_4621.jpeg'], active:true },
 ];
+const PRODUCT_STORAGE_KEY = 'vv_products';
+const PRODUCT_MIGRATION_KEY = 'vv_products_global_v2';
+const REMOVED_PRODUCT_IDS = new Set([
+  'grace-leggings',
+  'renew-devotional',
+  'temple-strong',
+  'stillwater-bra',
+  'wellness-planner',
+  'soul-sweat',
+]);
+let productsCache = DEFAULT_PRODUCTS.map(normalizeProduct);
 
 function normalizeProduct(product) {
   const rawMediaUrls = Array.isArray(product.mediaUrls) ? product.mediaUrls : [];
@@ -555,43 +598,63 @@ function normalizeProduct(product) {
   };
 }
 
-function migrateProductEmojis(products) {
-  return products.map(product => normalizeProduct({ ...product, emoji: '' }));
+function migrateProducts(products) {
+  return products
+    .filter(product => !REMOVED_PRODUCT_IDS.has(product.id))
+    .map(product => normalizeProduct({ ...product, emoji: '' }));
+}
+
+async function readSharedProducts() {
+  try {
+    const record = await window.storage.get(PRODUCT_STORAGE_KEY);
+    return record?.value ? JSON.parse(record.value) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeProductsToStores(products) {
+  const serialized = JSON.stringify(products);
+  productsCache = products.map(normalizeProduct);
+  localStorage.setItem(PRODUCT_STORAGE_KEY, serialized);
+  localStorage.setItem(PRODUCT_MIGRATION_KEY, '1');
+  try { await window.storage.set(PRODUCT_STORAGE_KEY, serialized, true); } catch {}
+}
+
+async function initializeProductsStore() {
+  let products = await readSharedProducts();
+  if (!Array.isArray(products) || products.length === 0) {
+    try {
+      const local = JSON.parse(localStorage.getItem(PRODUCT_STORAGE_KEY) || 'null');
+      if (Array.isArray(local) && local.length) products = local;
+    } catch {}
+  }
+  const baseProducts = Array.isArray(products) && products.length ? products : DEFAULT_PRODUCTS;
+  const migrated = migrateProducts(baseProducts);
+  const changed = !Array.isArray(products)
+    || products.length !== migrated.length
+    || products.some((product, index) => JSON.stringify(product) !== JSON.stringify(migrated[index]));
+  if (changed || !localStorage.getItem(PRODUCT_MIGRATION_KEY)) {
+    await writeProductsToStores(migrated);
+  } else {
+    productsCache = migrated.map(normalizeProduct);
+    localStorage.setItem(PRODUCT_STORAGE_KEY, JSON.stringify(migrated));
+    localStorage.setItem(PRODUCT_MIGRATION_KEY, '1');
+  }
+  return productsCache;
 }
 
 function getProducts() {
-  try {
-    const s = localStorage.getItem('vv_products');
-    if (!s) {
-      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return DEFAULT_PRODUCTS.map(normalizeProduct);
-    }
-    const parsed = JSON.parse(s);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return DEFAULT_PRODUCTS.map(normalizeProduct);
-    }
-    if (!localStorage.getItem('vv_products_emojis_removed_v1')) {
-      const migrated = migrateProductEmojis(parsed);
-      localStorage.setItem('vv_products', JSON.stringify(migrated));
-      localStorage.setItem('vv_products_emojis_removed_v1', '1');
-      return migrated;
-    }
-    return parsed.map(normalizeProduct);
-  } catch { return DEFAULT_PRODUCTS.map(normalizeProduct); }
+  return productsCache;
 }
-function saveProducts(prods) {
-  localStorage.setItem('vv_products', JSON.stringify(prods));
-  localStorage.setItem('vv_products_emojis_removed_v1', '1');
+async function saveProducts(prods) {
+  await writeProductsToStores(migrateProducts(prods));
   updateStats();
   renderTable();
 }
-function resetToDefaults() {
+async function resetToDefaults() {
   if (!confirm('Reset all products to defaults? This will remove any custom products you have added.')) return;
-  localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
-  localStorage.setItem('vv_products_emojis_removed_v1', '1');
+  await writeProductsToStores(DEFAULT_PRODUCTS);
   updateStats();
   renderTable();
   notify('Products reset to defaults (' + DEFAULT_PRODUCTS.length + ' products)', 'success');
@@ -802,8 +865,7 @@ function saveProduct() {
     products.push(product);
     notify('Product added!', 'success');
   }
-  saveProducts(products);
-  closeDrawer();
+  saveProducts(products).then(() => closeDrawer());
 }
 
 /* ─── TABLE ─── */
@@ -845,9 +907,9 @@ let deleteTargetId = null;
 function confirmDelete(id) {
   deleteTargetId = id;
   document.getElementById('confirmModal').classList.add('open');
-  document.getElementById('confirmYes').onclick = () => {
+  document.getElementById('confirmYes').onclick = async () => {
     const products = getProducts().filter(p => p.id !== deleteTargetId);
-    saveProducts(products);
+    await saveProducts(products);
     document.getElementById('confirmModal').classList.remove('open');
     notify('Product deleted', 'success');
   };
@@ -904,6 +966,12 @@ function syncPifDisplay(event) {
   updatePifDisplay();
 }
 
+async function refreshProductsFromSharedStore() {
+  await initializeProductsStore();
+  renderTable();
+  updateStats();
+}
+
 /* ─── NOTIFY ─── */
 function notify(msg, type='success') {
   const n = document.getElementById('notif');
@@ -912,16 +980,53 @@ function notify(msg, type='success') {
   setTimeout(() => n.classList.remove('show'), 3000);
 }
 
-/* ─── INIT ─── */
-window.addEventListener('DOMContentLoaded', async () => {
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = '0000';
+const ADMIN_AUTH_KEY = 'vv_admin_auth';
+
+function unlockAdminUi() {
+  document.body.classList.remove('auth-locked');
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('adminLayout').classList.remove('hidden');
+}
+
+async function bootAdmin() {
+  await initializeProductsStore();
   renderTable();
   updateStats();
   await updatePifDisplay();
   updatePifLog();
+}
+
+async function loginAdmin() {
+  const username = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value;
+  const error = document.getElementById('authError');
+  if (username !== ADMIN_USERNAME || password !== ADMIN_PASSWORD) {
+    error.textContent = 'Invalid username or password.';
+    return;
+  }
+  sessionStorage.setItem(ADMIN_AUTH_KEY, '1');
+  error.textContent = '';
+  unlockAdminUi();
+  await bootAdmin();
+}
+
+/* ─── INIT ─── */
+window.addEventListener('DOMContentLoaded', async () => {
+  if (sessionStorage.getItem(ADMIN_AUTH_KEY) === '1') {
+    unlockAdminUi();
+    await bootAdmin();
+  } else {
+    document.getElementById('loginPass').focus();
+  }
 });
 window.addEventListener('storage', syncPifDisplay);
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) updatePifDisplay();
+  if (!document.hidden) {
+    updatePifDisplay();
+    refreshProductsFromSharedStore();
+  }
 });
 </script>
 </body>
