@@ -741,6 +741,9 @@ footer {
   flex-shrink: 0; display: flex; align-items: center;
   justify-content: center; font-size: 2.2rem;
 }
+.cart-item-thumb img {
+  width: 100%; height: 100%; object-fit: cover;
+}
 .cart-item-info { flex: 1; }
 .cart-item-name { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 4px; }
 .cart-item-variant { font-size: 0.75rem; color: var(--grey-4); margin-bottom: 12px; }
@@ -1386,39 +1389,66 @@ footer {
    STORE STATE
 ═══════════════════════════════════════════ */
 const DEFAULT_PRODUCTS = [
-  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'🧘‍♀️', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25' },
-  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'📖', tag:'', verse:'Daily scripture, reflection, and wellness prompts.' },
-  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'💪', tag:'digital', verse:'Faith-integrated training combining strength and scripture.' },
-  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'✨', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10' },
-  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'📓', tag:'', verse:'Track habits, prayers, workouts, and scripture.' },
-  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'🎧', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.' },
-  { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'🖤', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg' },
-  { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'💙', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg' },
-  { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'🤍', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg' },
-  { id:'strength-dignity-tee', name:'Strength & Dignity Performance Tee', cat:'apparel', price:36, emoji:'💙', tag:'new', verse:'"She is clothed with strength and dignity" — Proverbs 31:25', mediaUrl:'images/IMG_4606.jpeg' },
-  { id:'faith-over-fear-tank', name:'Faith Over Fear Tank Top', cat:'apparel', price:28, emoji:'💧', tag:'', verse:'"For God has not given us a spirit of fear." — 2 Timothy 1:7', mediaUrl:'images/IMG_4607.jpeg' },
-  { id:'walk-in-faith-bra', name:'Walk in Faith Sports Bra', cat:'apparel', price:38, oldPrice:48, emoji:'🩷', tag:'sale', verse:'"We walk by faith, not by sight." — 2 Corinthians 5:7', mediaUrl:'images/IMG_4608.jpeg' },
-  { id:'weak-strong-tee', name:'When I Am Weak Tee', cat:'apparel', price:32, emoji:'🤍', tag:'', verse:'"For when I am weak, then I am strong." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4610.jpeg' },
-  { id:'grace-water-bottle', name:'His Grace Water Bottle', cat:'accessories', price:35, emoji:'🌸', tag:'new', verse:'"His grace is sufficient for me." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4611.jpeg' },
-  { id:'be-strong-bottle', name:'Be Strong & Courageous Bottle', cat:'accessories', price:38, emoji:'🖤', tag:'', verse:'"Be strong and courageous." — Joshua 1:9', mediaUrl:'images/IMG_4612.jpeg' },
-  { id:'lgs-shaker', name:"Let's Get Serious Shaker", cat:'accessories', price:22, emoji:'🥛', tag:'', verse:'"Let\'s get serious for Jesus." Train with purpose.', mediaUrl:'images/IMG_4613.jpeg' },
-  { id:'psalm-water-bottle', name:'God Is Within Her Water Bottle', cat:'accessories', price:28, emoji:'✨', tag:'', verse:'"God is within her, she will not fall." — Psalm 46:5', mediaUrl:'images/IMG_4614.jpeg' },
-  { id:'body-of-worship', name:'A Body of Worship', cat:'devotional', price:18, emoji:'📗', tag:'', verse:'A fitness devotional to help you serve God longer & stronger. By Kara Bruegger.', mediaUrl:'images/IMG_4615.jpeg' },
-  { id:'faithfully-fit', name:'Faithfully Fit', cat:'devotional', price:16, emoji:'📘', tag:'', verse:'A 40-Day Devotional Plan to End the Yo-Yo Lifestyle of Chronic Dieting.', mediaUrl:'images/IMG_4617.jpeg' },
-  { id:'40-days-faith-fitness', name:'40 Days of Faith and Fitness', cat:'devotional', price:14, emoji:'📙', tag:'', verse:'A Devotional Journal to align your faith and fitness journey. By Marsha Apsley.', mediaUrl:'images/IMG_4618.jpeg' },
-  { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'📓', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg' },
-  { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'🏋️', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg' },
-  { id:'dcul-womens', name:'DC-UL 1.0 — Women\'s Edition', cat:'digital', price:39, emoji:'💜', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg' },
+  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25' },
+  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'', tag:'', verse:'Daily scripture, reflection, and wellness prompts.' },
+  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'', tag:'digital', verse:'Faith-integrated training combining strength and scripture.' },
+  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10' },
+  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'', tag:'', verse:'Track habits, prayers, workouts, and scripture.' },
+  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.' },
+  { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg' },
+  { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg' },
+  { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg' },
+  { id:'strength-dignity-tee', name:'Strength & Dignity Performance Tee', cat:'apparel', price:36, emoji:'', tag:'new', verse:'"She is clothed with strength and dignity" — Proverbs 31:25', mediaUrl:'images/IMG_4606.jpeg' },
+  { id:'faith-over-fear-tank', name:'Faith Over Fear Tank Top', cat:'apparel', price:28, emoji:'', tag:'', verse:'"For God has not given us a spirit of fear." — 2 Timothy 1:7', mediaUrl:'images/IMG_4607.jpeg' },
+  { id:'walk-in-faith-bra', name:'Walk in Faith Sports Bra', cat:'apparel', price:38, oldPrice:48, emoji:'', tag:'sale', verse:'"We walk by faith, not by sight." — 2 Corinthians 5:7', mediaUrl:'images/IMG_4608.jpeg' },
+  { id:'weak-strong-tee', name:'When I Am Weak Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'"For when I am weak, then I am strong." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4610.jpeg' },
+  { id:'grace-water-bottle', name:'His Grace Water Bottle', cat:'accessories', price:35, emoji:'', tag:'new', verse:'"His grace is sufficient for me." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4611.jpeg' },
+  { id:'be-strong-bottle', name:'Be Strong & Courageous Bottle', cat:'accessories', price:38, emoji:'', tag:'', verse:'"Be strong and courageous." — Joshua 1:9', mediaUrl:'images/IMG_4612.jpeg' },
+  { id:'lgs-shaker', name:"Let's Get Serious Shaker", cat:'accessories', price:22, emoji:'', tag:'', verse:'"Let\'s get serious for Jesus." Train with purpose.', mediaUrl:'images/IMG_4613.jpeg' },
+  { id:'psalm-water-bottle', name:'God Is Within Her Water Bottle', cat:'accessories', price:28, emoji:'', tag:'', verse:'"God is within her, she will not fall." — Psalm 46:5', mediaUrl:'images/IMG_4614.jpeg' },
+  { id:'body-of-worship', name:'A Body of Worship', cat:'devotional', price:18, emoji:'', tag:'', verse:'A fitness devotional to help you serve God longer & stronger. By Kara Bruegger.', mediaUrl:'images/IMG_4615.jpeg' },
+  { id:'faithfully-fit', name:'Faithfully Fit', cat:'devotional', price:16, emoji:'', tag:'', verse:'A 40-Day Devotional Plan to End the Yo-Yo Lifestyle of Chronic Dieting.', mediaUrl:'images/IMG_4617.jpeg' },
+  { id:'40-days-faith-fitness', name:'40 Days of Faith and Fitness', cat:'devotional', price:14, emoji:'', tag:'', verse:'A Devotional Journal to align your faith and fitness journey. By Marsha Apsley.', mediaUrl:'images/IMG_4618.jpeg' },
+  { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg' },
+  { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg' },
+  { id:'dcul-womens', name:'DC-UL 1.0 — Women\'s Edition', cat:'digital', price:39, emoji:'', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg' },
 ];
+
+function normalizeProduct(product) {
+  const mediaUrl = product.mediaUrl || product.mediaUrls?.[0] || '';
+  return {
+    ...product,
+    mediaUrl: mediaUrl || null,
+    emoji: mediaUrl ? '' : (product.emoji || ''),
+  };
+}
+
+function migrateProductEmojis(products) {
+  return products.map(product => normalizeProduct({ ...product, emoji: '' }));
+}
 
 function getProducts() {
   try {
     const s = localStorage.getItem('vv_products');
-    if (!s) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    if (!s) {
+      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return DEFAULT_PRODUCTS.map(normalizeProduct);
+    }
     const parsed = JSON.parse(s);
-    if (!Array.isArray(parsed) || parsed.length === 0) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
-    return parsed;
-  } catch { return DEFAULT_PRODUCTS; }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return DEFAULT_PRODUCTS.map(normalizeProduct);
+    }
+    if (!localStorage.getItem('vv_products_emojis_removed_v1')) {
+      const migrated = migrateProductEmojis(parsed);
+      localStorage.setItem('vv_products', JSON.stringify(migrated));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return migrated;
+    }
+    return parsed.map(normalizeProduct);
+  } catch { return DEFAULT_PRODUCTS.map(normalizeProduct); }
 }
 
 // PIF state via Artifact Storage + localStorage fallback
@@ -1508,7 +1538,7 @@ function renderCart() {
   foot.style.display = 'block';
   body.innerHTML = cart.map(item => `
     <div class="cart-item">
-      <div class="cart-item-thumb">${item.emoji}</div>
+      <div class="cart-item-thumb">${item.mediaUrl ? `<img src="${item.mediaUrl}" alt="${item.name}">` : (item.emoji || '')}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
         <div class="cart-item-variant">${item.cat} · ${item.tag === 'digital' ? 'Instant Download' : 'Physical Product'}</div>
@@ -1703,10 +1733,10 @@ function renderProducts(filter) {
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" data-cat="${p.cat}">
       <div class="product-media img-skeleton" style="background:${p.bg||'var(--black-3)'}">
-        ${!p.mediaUrl ? `<div class="product-emoji" aria-hidden="true">${p.emoji||'✦'}</div>` : ''}
+        ${!p.mediaUrl && p.emoji ? `<div class="product-emoji" aria-hidden="true">${p.emoji}</div>` : ''}
         ${p.tag ? `<div class="product-tag tag-${p.tag}" aria-label="${p.tag} product">${p.tag}</div>` : ''}
         ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onload="this.classList.add('loaded');this.closest('.product-media').classList.remove('img-skeleton')">` : ''}
-        <button class="product-add-btn" aria-label="Add ${p.name} to cart" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"✦",tag:p.tag||""})});openCart()'>
+        <button class="product-add-btn" aria-label="Add ${p.name} to cart" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"",mediaUrl:p.mediaUrl||"",tag:p.tag||""})});openCart()'>
           Add to Cart
         </button>
       </div>

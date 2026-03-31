@@ -265,7 +265,7 @@ a{text-decoration:none;color:inherit}
 /* ─── EMOJI PICKER ─── */
 .emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .emoji-opt{
-  width:36px;height:36px;background:var(--black-3);
+  min-width:36px;height:36px;padding:0 10px;background:var(--black-3);
   border:1px solid var(--grey-2);font-size:1.2rem;
   transition:all var(--transition);display:flex;align-items:center;justify-content:center;
 }
@@ -518,48 +518,80 @@ a{text-decoration:none;color:inherit}
    ADMIN STATE
 ═══════════════════════════════════════════ */
 const DEFAULT_PRODUCTS = [
-  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'🧘‍♀️', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25', active:true },
-  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'📖', tag:'', verse:'Daily scripture, reflection, and wellness prompts.', active:true },
-  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'💪', tag:'digital', verse:'Faith-integrated training combining strength and scripture.', active:true },
-  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'✨', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10', active:true },
-  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'📓', tag:'', verse:'Track habits, prayers, workouts, and scripture.', active:true },
-  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'🎧', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.', active:true },
-  { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'🖤', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg', mediaUrls:['images/IMG_4602.jpeg'], active:true },
-  { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'💙', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg', mediaUrls:['images/IMG_4603.jpeg'], active:true },
-  { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'🤍', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg', mediaUrls:['images/IMG_4604.jpeg'], active:true },
-  { id:'strength-dignity-tee', name:'Strength & Dignity Performance Tee', cat:'apparel', price:36, emoji:'💙', tag:'new', verse:'"She is clothed with strength and dignity" — Proverbs 31:25', mediaUrl:'images/IMG_4606.jpeg', mediaUrls:['images/IMG_4606.jpeg'], active:true },
-  { id:'faith-over-fear-tank', name:'Faith Over Fear Tank Top', cat:'apparel', price:28, emoji:'💧', tag:'', verse:'"For God has not given us a spirit of fear." — 2 Timothy 1:7', mediaUrl:'images/IMG_4607.jpeg', mediaUrls:['images/IMG_4607.jpeg'], active:true },
-  { id:'walk-in-faith-bra', name:'Walk in Faith Sports Bra', cat:'apparel', price:38, oldPrice:48, emoji:'🩷', tag:'sale', verse:'"We walk by faith, not by sight." — 2 Corinthians 5:7', mediaUrl:'images/IMG_4608.jpeg', mediaUrls:['images/IMG_4608.jpeg'], active:true },
-  { id:'weak-strong-tee', name:'When I Am Weak Tee', cat:'apparel', price:32, emoji:'🤍', tag:'', verse:'"For when I am weak, then I am strong." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4610.jpeg', mediaUrls:['images/IMG_4610.jpeg'], active:true },
-  { id:'grace-water-bottle', name:'His Grace Water Bottle', cat:'accessories', price:35, emoji:'🌸', tag:'new', verse:'"His grace is sufficient for me." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4611.jpeg', mediaUrls:['images/IMG_4611.jpeg'], active:true },
-  { id:'be-strong-bottle', name:'Be Strong & Courageous Bottle', cat:'accessories', price:38, emoji:'🖤', tag:'', verse:'"Be strong and courageous." — Joshua 1:9', mediaUrl:'images/IMG_4612.jpeg', mediaUrls:['images/IMG_4612.jpeg'], active:true },
-  { id:'lgs-shaker', name:"Let's Get Serious Shaker", cat:'accessories', price:22, emoji:'🥛', tag:'', verse:"Let's get serious for Jesus. Train with purpose.", mediaUrl:'images/IMG_4613.jpeg', mediaUrls:['images/IMG_4613.jpeg'], active:true },
-  { id:'psalm-water-bottle', name:'God Is Within Her Water Bottle', cat:'accessories', price:28, emoji:'✨', tag:'', verse:'"God is within her, she will not fall." — Psalm 46:5', mediaUrl:'images/IMG_4614.jpeg', mediaUrls:['images/IMG_4614.jpeg'], active:true },
-  { id:'body-of-worship', name:'A Body of Worship', cat:'devotional', price:18, emoji:'📗', tag:'', verse:'A fitness devotional to help you serve God longer & stronger. By Kara Bruegger.', mediaUrl:'images/IMG_4615.jpeg', mediaUrls:['images/IMG_4615.jpeg'], active:true },
-  { id:'faithfully-fit', name:'Faithfully Fit', cat:'devotional', price:16, emoji:'📘', tag:'', verse:'A 40-Day Devotional Plan to End the Yo-Yo Lifestyle of Chronic Dieting.', mediaUrl:'images/IMG_4617.jpeg', mediaUrls:['images/IMG_4617.jpeg'], active:true },
-  { id:'40-days-faith-fitness', name:'40 Days of Faith and Fitness', cat:'devotional', price:14, emoji:'📙', tag:'', verse:'A Devotional Journal to align your faith and fitness journey. By Marsha Apsley.', mediaUrl:'images/IMG_4618.jpeg', mediaUrls:['images/IMG_4618.jpeg'], active:true },
-  { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'📓', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg', mediaUrls:['images/IMG_4619.jpeg'], active:true },
-  { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'🏋️', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg', mediaUrls:['images/IMG_4620.jpeg'], active:true },
-  { id:'dcul-womens', name:"DC-UL 1.0 — Women's Edition", cat:'digital', price:39, emoji:'💜', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg', mediaUrls:['images/IMG_4621.jpeg'], active:true },
+  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25', active:true },
+  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'', tag:'', verse:'Daily scripture, reflection, and wellness prompts.', active:true },
+  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'', tag:'digital', verse:'Faith-integrated training combining strength and scripture.', active:true },
+  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10', active:true },
+  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'', tag:'', verse:'Track habits, prayers, workouts, and scripture.', active:true },
+  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.', active:true },
+  { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg', mediaUrls:['images/IMG_4602.jpeg'], active:true },
+  { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg', mediaUrls:['images/IMG_4603.jpeg'], active:true },
+  { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg', mediaUrls:['images/IMG_4604.jpeg'], active:true },
+  { id:'strength-dignity-tee', name:'Strength & Dignity Performance Tee', cat:'apparel', price:36, emoji:'', tag:'new', verse:'"She is clothed with strength and dignity" — Proverbs 31:25', mediaUrl:'images/IMG_4606.jpeg', mediaUrls:['images/IMG_4606.jpeg'], active:true },
+  { id:'faith-over-fear-tank', name:'Faith Over Fear Tank Top', cat:'apparel', price:28, emoji:'', tag:'', verse:'"For God has not given us a spirit of fear." — 2 Timothy 1:7', mediaUrl:'images/IMG_4607.jpeg', mediaUrls:['images/IMG_4607.jpeg'], active:true },
+  { id:'walk-in-faith-bra', name:'Walk in Faith Sports Bra', cat:'apparel', price:38, oldPrice:48, emoji:'', tag:'sale', verse:'"We walk by faith, not by sight." — 2 Corinthians 5:7', mediaUrl:'images/IMG_4608.jpeg', mediaUrls:['images/IMG_4608.jpeg'], active:true },
+  { id:'weak-strong-tee', name:'When I Am Weak Tee', cat:'apparel', price:32, emoji:'', tag:'', verse:'"For when I am weak, then I am strong." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4610.jpeg', mediaUrls:['images/IMG_4610.jpeg'], active:true },
+  { id:'grace-water-bottle', name:'His Grace Water Bottle', cat:'accessories', price:35, emoji:'', tag:'new', verse:'"His grace is sufficient for me." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4611.jpeg', mediaUrls:['images/IMG_4611.jpeg'], active:true },
+  { id:'be-strong-bottle', name:'Be Strong & Courageous Bottle', cat:'accessories', price:38, emoji:'', tag:'', verse:'"Be strong and courageous." — Joshua 1:9', mediaUrl:'images/IMG_4612.jpeg', mediaUrls:['images/IMG_4612.jpeg'], active:true },
+  { id:'lgs-shaker', name:"Let's Get Serious Shaker", cat:'accessories', price:22, emoji:'', tag:'', verse:"Let's get serious for Jesus. Train with purpose.", mediaUrl:'images/IMG_4613.jpeg', mediaUrls:['images/IMG_4613.jpeg'], active:true },
+  { id:'psalm-water-bottle', name:'God Is Within Her Water Bottle', cat:'accessories', price:28, emoji:'', tag:'', verse:'"God is within her, she will not fall." — Psalm 46:5', mediaUrl:'images/IMG_4614.jpeg', mediaUrls:['images/IMG_4614.jpeg'], active:true },
+  { id:'body-of-worship', name:'A Body of Worship', cat:'devotional', price:18, emoji:'', tag:'', verse:'A fitness devotional to help you serve God longer & stronger. By Kara Bruegger.', mediaUrl:'images/IMG_4615.jpeg', mediaUrls:['images/IMG_4615.jpeg'], active:true },
+  { id:'faithfully-fit', name:'Faithfully Fit', cat:'devotional', price:16, emoji:'', tag:'', verse:'A 40-Day Devotional Plan to End the Yo-Yo Lifestyle of Chronic Dieting.', mediaUrl:'images/IMG_4617.jpeg', mediaUrls:['images/IMG_4617.jpeg'], active:true },
+  { id:'40-days-faith-fitness', name:'40 Days of Faith and Fitness', cat:'devotional', price:14, emoji:'', tag:'', verse:'A Devotional Journal to align your faith and fitness journey. By Marsha Apsley.', mediaUrl:'images/IMG_4618.jpeg', mediaUrls:['images/IMG_4618.jpeg'], active:true },
+  { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg', mediaUrls:['images/IMG_4619.jpeg'], active:true },
+  { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg', mediaUrls:['images/IMG_4620.jpeg'], active:true },
+  { id:'dcul-womens', name:"DC-UL 1.0 — Women's Edition", cat:'digital', price:39, emoji:'', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg', mediaUrls:['images/IMG_4621.jpeg'], active:true },
 ];
+
+function normalizeProduct(product) {
+  const rawMediaUrls = Array.isArray(product.mediaUrls) ? product.mediaUrls : [];
+  const normalizedMediaUrls = rawMediaUrls.map(m => typeof m === 'string' ? { url: m, type: 'image', name: 'media' } : m).filter(m => m?.url);
+  const mediaUrl = product.mediaUrl || normalizedMediaUrls[0]?.url || null;
+  return {
+    ...product,
+    mediaUrl,
+    mediaUrls: normalizedMediaUrls.map(m => m.url),
+    emoji: mediaUrl ? '' : (product.emoji || ''),
+  };
+}
+
+function migrateProductEmojis(products) {
+  return products.map(product => normalizeProduct({ ...product, emoji: '' }));
+}
 
 function getProducts() {
   try {
     const s = localStorage.getItem('vv_products');
-    if (!s) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    if (!s) {
+      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return DEFAULT_PRODUCTS.map(normalizeProduct);
+    }
     const parsed = JSON.parse(s);
-    if (!Array.isArray(parsed) || parsed.length === 0) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
-    return parsed;
-  } catch { return DEFAULT_PRODUCTS; }
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return DEFAULT_PRODUCTS.map(normalizeProduct);
+    }
+    if (!localStorage.getItem('vv_products_emojis_removed_v1')) {
+      const migrated = migrateProductEmojis(parsed);
+      localStorage.setItem('vv_products', JSON.stringify(migrated));
+      localStorage.setItem('vv_products_emojis_removed_v1', '1');
+      return migrated;
+    }
+    return parsed.map(normalizeProduct);
+  } catch { return DEFAULT_PRODUCTS.map(normalizeProduct); }
 }
 function saveProducts(prods) {
   localStorage.setItem('vv_products', JSON.stringify(prods));
+  localStorage.setItem('vv_products_emojis_removed_v1', '1');
   updateStats();
   renderTable();
 }
 function resetToDefaults() {
   if (!confirm('Reset all products to defaults? This will remove any custom products you have added.')) return;
   localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+  localStorage.setItem('vv_products_emojis_removed_v1', '1');
   updateStats();
   renderTable();
   notify('Products reset to defaults (' + DEFAULT_PRODUCTS.length + ' products)', 'success');
@@ -607,14 +639,14 @@ function updatePifLog() {
 /* ─── EDITING STATE ─── */
 let editingId = null;
 let editingMediaFiles = [];
-let editingEmoji = '✦';
+let editingEmoji = '';
 
 const EMOJI_OPTIONS = ['🧘‍♀️','📖','💪','✨','📓','🎧','🙏','🌿','💛','🕊️','✝️','🌸','💎','🏃‍♀️','👗','🎁','📿','🌟'];
 
 function openAddProduct() {
   editingId = null;
   editingMediaFiles = [];
-  editingEmoji = '✦';
+  editingEmoji = '';
   document.getElementById('drawerTitle').textContent = 'Add Product';
   renderDrawerForm(null);
   document.getElementById('productDrawer').classList.add('open');
@@ -625,8 +657,11 @@ function openEditProduct(id) {
   const p = products.find(x => x.id === id);
   if (!p) return;
   editingId = id;
-  editingEmoji = p.emoji || '✦';
-  editingMediaFiles = p.mediaUrls ? [...p.mediaUrls] : [];
+  editingEmoji = p.emoji || '';
+  editingMediaFiles = (p.mediaUrls || []).map(media => typeof media === 'string'
+    ? { url: media, type: 'image', name: 'media' }
+    : media
+  );
   document.getElementById('drawerTitle').textContent = 'Edit Product';
   renderDrawerForm(p);
   document.getElementById('productDrawer').classList.add('open');
@@ -680,13 +715,15 @@ function renderDrawerForm(p) {
     </div>
 
     <div class="form-section">Emoji Icon</div>
-    <div style="margin-bottom:10px;font-size:0.78rem;color:var(--grey-4)">Selected: <span id="emojiPreview" style="font-size:1.4rem">${editingEmoji}</span></div>
+    <div style="margin-bottom:10px;font-size:0.78rem;color:var(--grey-4)">Selected: <span id="emojiPreview" style="font-size:1.4rem">${editingEmoji || 'None'}</span></div>
     <div class="emoji-grid" id="emojiGrid">
-      ${EMOJI_OPTIONS.map(e=>`<button class="emoji-opt ${e===editingEmoji?'selected':''}" onclick="selectEmoji('${e}',this)">${e}</button>`).join('')}
+      <button type="button" class="emoji-opt ${!editingEmoji?'selected':''}" onclick="selectEmoji('',this)">None</button>
+      ${EMOJI_OPTIONS.map(e=>`<button type="button" class="emoji-opt ${e===editingEmoji?'selected':''}" onclick="selectEmoji('${e}',this)">${e}</button>`).join('')}
     </div>
     <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
-      <input class="form-input" id="customEmoji" placeholder="Or type emoji..." style="width:120px" oninput="if(this.value){selectEmoji(this.value,null)}">
+      <input class="form-input" id="customEmoji" placeholder="Type emoji or leave blank" style="width:180px" value="${editingEmoji && !EMOJI_OPTIONS.includes(editingEmoji) ? editingEmoji : ''}" oninput="selectEmoji(this.value.trim(),null)">
     </div>
+    <div class="media-hint" style="margin-top:6px">If the product has a photo, the emoji is removed automatically.</div>
 
     <div class="form-section">Photos & Videos</div>
     <div class="media-grid" id="mediaGrid"></div>
@@ -702,7 +739,7 @@ function renderDrawerForm(p) {
 
 function selectEmoji(e, btn) {
   editingEmoji = e;
-  document.getElementById('emojiPreview').textContent = e;
+  document.getElementById('emojiPreview').textContent = e || 'None';
   document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
   if (btn) btn.classList.add('selected');
 }
@@ -750,7 +787,7 @@ function saveProduct() {
   const product = {
     id: editingId || 'p_' + Date.now(),
     name, cat, price, oldPrice, tag, verse,
-    emoji: editingEmoji,
+    emoji: editingMediaFiles.length ? '' : editingEmoji,
     mediaUrls: editingMediaFiles.map(m => m.url),
     mediaUrl: editingMediaFiles[0]?.url || null,
     active: true,
@@ -785,7 +822,7 @@ function renderTable() {
     <tr>
       <td>
         <div class="prod-row-info">
-          <div class="prod-thumb">${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}">` : p.emoji||'✦'}</div>
+          <div class="prod-thumb">${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}">` : (p.emoji || '')}</div>
           <div><div class="prod-name">${p.name}</div><div class="prod-id">${p.id}</div></div>
         </div>
       </td>
