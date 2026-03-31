@@ -311,6 +311,10 @@ nav.scrolled {
   animation: shimmer 1.6s infinite linear;
 }
 .product-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
   opacity: 0;
 }
@@ -436,6 +440,8 @@ nav.scrolled {
   background: var(--black-2);
   border-top: 1px solid rgba(255,255,255,0.06);
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
 }
 .callout-inner {
   max-width: 1400px; margin: 0 auto;
@@ -472,6 +478,14 @@ nav.scrolled {
 
 /* ─── CATEGORIES ─── */
 .categories-section { background: var(--black); padding: 0 0 100px; }
+.categories-section,
+.testimonials-section,
+.newsletter,
+footer,
+.pif-banner {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
+}
 .categories-header { padding: 100px 32px 48px; }
 .categories-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
@@ -830,6 +844,7 @@ footer {
 }
 .gallery-main {
   display: block;
+  width: 100%;
   max-width: 100%; max-height: 100%; object-fit: contain;
   transition: transform 0.25s ease; cursor: zoom-in;
 }
@@ -1107,11 +1122,41 @@ footer {
   .newsletter-form { flex-direction: column; }
   .form-row { grid-template-columns: 1fr; }
   .callout-metrics { grid-template-columns: repeat(2, 1fr); }
+  .product-media { aspect-ratio: 4 / 5; }
+  .product-body { padding: 16px 16px 18px; }
+  .product-name { font-size: 1.02rem; }
+  .product-verse { font-size: 0.75rem; }
+  .cart-item-thumb { width: 64px; height: 80px; }
   .gallery-modal { grid-template-columns: 1fr; }
+  .gallery-overlay { padding: 12px; }
+  .gallery-modal { width: 100%; max-height: calc(100dvh - 24px); }
   .gallery-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
-  .gallery-stage { min-height: 50vh; }
-  .gallery-thumbs { grid-template-columns: repeat(4, 1fr); }
+  .gallery-stage { min-height: 45dvh; }
+  .gallery-panel { padding: 16px; }
+  .gallery-title { font-size: 1.2rem; }
+  .gallery-thumbs { grid-template-columns: repeat(3, 1fr); }
   .gallery-stage.zoomed .gallery-main { min-width: 220%; }
+  nav,
+  .cart-overlay,
+  .modal-overlay,
+  .gallery-overlay,
+  .cart-drawer,
+  .modal {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .marquee { display: none; }
+  .hero-eyebrow,
+  .hero-title,
+  .hero-sub,
+  .hero-actions,
+  .hero-verse,
+  .callout-visual-inner,
+  .marquee-track {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 @media (max-width: 480px) {
   nav { padding: 0 16px; }
@@ -1121,6 +1166,8 @@ footer {
   .categories-grid { grid-template-columns: 1fr; }
   .cart-drawer { width: 100vw; }
   .pif-options { grid-template-columns: repeat(2, 1fr); }
+  .product-media { aspect-ratio: 1 / 1.18; }
+  .gallery-thumbs { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -1913,13 +1960,13 @@ function renderProducts(filter) {
     grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--grey-4);grid-column:1/-1">No products in this category yet.</div>';
     return;
   }
-  grid.innerHTML = filtered.map(p => `
+  grid.innerHTML = filtered.map((p, index) => `
     <div class="product-card" data-cat="${p.cat}">
       <div class="product-media img-skeleton" style="background:${p.bg||'var(--black-3)'}">
         ${p.mediaUrl ? `<button type="button" class="product-media-button" onclick="openProductGallery('${p.id}')" aria-label="Open image gallery for ${p.name}"></button>` : ''}
         ${!p.mediaUrl && p.emoji ? `<div class="product-emoji" aria-hidden="true">${p.emoji}</div>` : ''}
         ${p.tag ? `<div class="product-tag tag-${p.tag}" aria-label="${p.tag} product">${p.tag}</div>` : ''}
-        ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onload="this.classList.add('loaded');this.closest('.product-media').classList.remove('img-skeleton')">` : ''}
+        ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" loading="${index < 2 ? 'eager' : 'lazy'}" decoding="async" fetchpriority="${index < 2 ? 'high' : 'low'}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onload="this.classList.add('loaded');this.closest('.product-media').classList.remove('img-skeleton')">` : ''}
         <button class="product-add-btn" aria-label="Add ${p.name} to cart" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"",mediaUrl:p.mediaUrl||"",tag:p.tag||""})});openCart()'>
           Add to Cart
         </button>
@@ -1986,9 +2033,13 @@ function syncPifFromStorage(event) {
 /* ─── INIT ─── */
 window.addEventListener('DOMContentLoaded', async () => {
   renderProducts('all');
-  buildMarquee();
-  await updatePifStat();
   initLazyImages();
+  setTimeout(() => {
+    buildMarquee();
+  }, 0);
+  setTimeout(async () => {
+    await updatePifStat();
+  }, 0);
 });
 window.addEventListener('storage', syncPifFromStorage);
 window.addEventListener('keydown', (event) => {
