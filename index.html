@@ -10,6 +10,7 @@
 <link rel="manifest" href="manifest.json">
 <title>Virtue & Vitality — Faith · Fitness · Purpose</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════
@@ -23,18 +24,21 @@
   --black-4: #222222;
   --grey-1: #2a2a2a;
   --grey-2: #3a3a3a;
-  --grey-3: #555555;
-  --grey-4: #888888;
-  --grey-5: #aaaaaa;
+  --grey-3: #666666;
+  --grey-4: #999999;
+  --grey-5: #bbbbbb;
   --white: #ffffff;
   --off-white: #f5f5f5;
   --gold: #c9a96e;
   --gold-2: #e8d5b0;
   --gold-dim: rgba(201,169,110,0.15);
+  --gold-glow: rgba(201,169,110,0.25);
   --sage: #7a9e7e;
   --radius: 2px;
   --nav-h: 64px;
   --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-elevated: 0 8px 40px rgba(0,0,0,0.6);
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -44,12 +48,47 @@ body {
   color: var(--white);
   font-family: 'Inter', sans-serif;
   font-weight: 400;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
-button { cursor: pointer; font-family: inherit; }
+button { cursor: pointer; font-family: inherit; touch-action: manipulation; }
 a { text-decoration: none; color: inherit; }
 img { display: block; max-width: 100%; }
+
+/* ─── SKIP LINK (ACCESSIBILITY) ─── */
+.skip-link {
+  position: absolute; top: -100%; left: 16px;
+  background: var(--gold); color: var(--black);
+  padding: 8px 16px; font-size: 0.8rem; font-weight: 600;
+  z-index: 9999; transition: top 0.2s;
+}
+.skip-link:focus { top: 16px; }
+
+/* ─── FOCUS STATES (ACCESSIBILITY) ─── */
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+button:focus-visible, a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ─── REDUCED MOTION ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ─── VISUALLY HIDDEN (SCREEN READER ONLY) ─── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
 
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar { width: 4px; }
@@ -62,11 +101,15 @@ nav {
   height: var(--nav-h);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 32px;
-  background: rgba(10,10,10,0.92);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  transition: background var(--transition);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+nav.scrolled {
+  background: rgba(10,10,10,0.97);
+  box-shadow: 0 1px 32px rgba(0,0,0,0.5);
 }
 .nav-logo {
   font-family: 'Playfair Display', serif;
@@ -125,8 +168,10 @@ nav {
 }
 .hero-bg {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,169,110,0.07) 0%, transparent 70%),
-              radial-gradient(ellipse 50% 50% at 20% 80%, rgba(122,158,126,0.05) 0%, transparent 60%);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 40%, rgba(201,169,110,0.12) 0%, transparent 65%),
+    radial-gradient(ellipse 45% 45% at 15% 75%, rgba(122,158,126,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 35% at 85% 20%, rgba(201,169,110,0.05) 0%, transparent 50%);
 }
 .hero-grid-lines {
   position: absolute; inset: 0; pointer-events: none;
@@ -168,15 +213,27 @@ nav {
   font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em;
   border: none; transition: all var(--transition);
 }
-.btn-xl-white { background: var(--white); color: var(--black); }
-.btn-xl-white:hover { background: var(--off-white); transform: translateY(-1px); }
+.btn-xl-white {
+  background: var(--white); color: var(--black);
+  box-shadow: 0 2px 20px rgba(255,255,255,0.1);
+}
+.btn-xl-white:hover { background: var(--off-white); transform: translateY(-2px); box-shadow: 0 4px 28px rgba(255,255,255,0.15); }
+.btn-xl-white:active { transform: translateY(0); }
 .btn-xl-outline {
   background: transparent; color: var(--white);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.25);
 }
-.btn-xl-outline:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
+.btn-xl-outline:hover { border-color: rgba(255,255,255,0.6); transform: translateY(-2px); background: rgba(255,255,255,0.04); }
+.btn-xl-outline:active { transform: translateY(0); }
+.btn-xl-gold {
+  background: var(--gold); color: var(--black);
+  border: none; font-weight: 600;
+  box-shadow: 0 2px 20px rgba(201,169,110,0.3);
+}
+.btn-xl-gold:hover { background: var(--gold-2); transform: translateY(-2px); box-shadow: 0 4px 32px rgba(201,169,110,0.4); }
+.btn-xl-gold:active { transform: translateY(0); }
 .hero-verse {
-  margin-top: 64px; font-size: 0.8rem; color: var(--grey-3);
+  margin-top: 64px; font-size: 0.82rem; color: var(--grey-4);
   font-style: italic; letter-spacing: 0.02em;
   opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
 }
@@ -242,6 +299,23 @@ nav {
   display: flex; justify-content: space-between; align-items: flex-end;
   margin-bottom: 48px; gap: 24px; flex-wrap: wrap;
 }
+
+/* ─── IMAGE SKELETON / SHIMMER ─── */
+@keyframes shimmer {
+  0% { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+.img-skeleton {
+  background: linear-gradient(90deg, var(--black-3) 25%, var(--black-4) 50%, var(--black-3) 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+.product-media img {
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+  opacity: 0;
+}
+.product-media img.loaded { opacity: 0.9; }
+.product-card:hover .product-media img.loaded { opacity: 1; transform: scale(1.04); }
 .filter-row {
   display: flex; gap: 4px; flex-wrap: wrap; margin-top: 20px;
 }
@@ -261,9 +335,14 @@ nav {
 .product-card {
   background: var(--black-2);
   position: relative; overflow: hidden;
-  transition: background var(--transition);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
 }
-.product-card:hover { background: var(--black-3); }
+.product-card:hover {
+  background: var(--black-3);
+  box-shadow: var(--shadow-card);
+  transform: translateY(-2px);
+  z-index: 1;
+}
 .product-media {
   aspect-ratio: 4/5; position: relative; overflow: hidden;
   background: var(--black-3);
@@ -289,14 +368,15 @@ nav {
 .tag-digital { background: var(--sage); color: var(--white); }
 .product-add-btn {
   position: absolute; bottom: 0; left: 0; right: 0;
-  height: 48px; background: rgba(10,10,10,0.95);
-  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em;
-  color: var(--white); border: none;
-  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  height: 52px; background: rgba(10,10,10,0.96);
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--white); border: none; border-top: 1px solid rgba(255,255,255,0.1);
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), background 0.2s;
   display: flex; align-items: center; justify-content: center; gap: 8px;
+  backdrop-filter: blur(8px);
 }
 .product-card:hover .product-add-btn { transform: translateY(0); }
-.product-add-btn:hover { background: var(--white); color: var(--black); }
+.product-add-btn:hover { background: var(--gold); color: var(--black); }
 .product-body { padding: 20px 24px 24px; }
 .product-cat {
   font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
@@ -477,10 +557,18 @@ nav {
   background: rgba(255,255,255,0.06); margin-top: 48px;
 }
 .testimonial {
-  background: var(--black-2); padding: 32px;
-  transition: background var(--transition);
+  background: var(--black-2); padding: 36px 32px;
+  transition: background var(--transition), box-shadow var(--transition);
+  position: relative;
 }
-.testimonial:hover { background: var(--black-3); }
+.testimonial::before {
+  content: '\201C';
+  position: absolute; top: 24px; right: 28px;
+  font-family: 'Playfair Display', serif;
+  font-size: 5rem; color: var(--gold); opacity: 0.12; line-height: 1;
+  pointer-events: none;
+}
+.testimonial:hover { background: var(--black-3); box-shadow: var(--shadow-card); }
 .t-stars { color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 16px; }
 .t-text {
   font-family: 'Playfair Display', serif;
@@ -514,15 +602,16 @@ nav {
   outline: none; transition: border-color var(--transition);
 }
 .newsletter-form input::placeholder { color: var(--grey-3); }
-.newsletter-form input:focus { border-color: var(--grey-4); }
+.newsletter-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,169,110,0.1); }
 .btn-subscribe {
   height: 48px; padding: 0 24px;
-  background: var(--white); color: var(--black);
-  border: none; font-size: 0.8rem; font-weight: 500;
+  background: var(--gold); color: var(--black);
+  border: none; font-size: 0.8rem; font-weight: 600;
   letter-spacing: 0.06em; white-space: nowrap;
-  transition: background var(--transition);
+  transition: all var(--transition);
 }
-.btn-subscribe:hover { background: var(--off-white); }
+.btn-subscribe:hover { background: var(--gold-2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,169,110,0.3); }
+.btn-subscribe:active { transform: translateY(0); }
 .newsletter-note { font-size: 0.72rem; color: var(--grey-3); margin-top: 12px; }
 
 /* ─── FOOTER PWA ─── */
@@ -680,12 +769,14 @@ footer {
 .cart-subtotal-val { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
 .btn-checkout {
   width: 100%; height: 52px;
-  background: var(--white); color: var(--black);
-  border: none; font-size: 0.85rem; font-weight: 500;
+  background: var(--gold); color: var(--black);
+  border: none; font-size: 0.85rem; font-weight: 600;
   letter-spacing: 0.08em; text-transform: uppercase;
-  transition: background var(--transition);
+  transition: all var(--transition);
+  box-shadow: 0 2px 16px rgba(201,169,110,0.3);
 }
-.btn-checkout:hover { background: var(--off-white); }
+.btn-checkout:hover { background: var(--gold-2); box-shadow: 0 4px 24px rgba(201,169,110,0.45); }
+.btn-checkout:active { transform: scale(0.99); }
 .cart-pif-hint {
   margin-top: 10px; font-size: 0.72rem; color: var(--grey-4);
   text-align: center; font-style: italic;
@@ -953,14 +1044,16 @@ footer {
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
 <!-- Cart Overlay -->
-<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()" aria-hidden="true"></div>
 
 <!-- Cart Drawer -->
 <div class="cart-drawer" id="cartDrawer">
   <div class="cart-head">
     <span class="cart-head-title">Your Cart</span>
-    <button class="cart-close" onclick="closeCart()">✕</button>
+    <button class="cart-close" onclick="closeCart()" aria-label="Close cart">✕</button>
   </div>
   <div class="cart-body" id="cartBody">
     <div class="cart-empty" id="cartEmpty">
@@ -984,7 +1077,7 @@ footer {
   <div class="modal" id="checkoutModalInner">
     <div class="modal-head">
       <span class="modal-title" id="checkoutTitle">Checkout</span>
-      <button class="modal-close" onclick="closeCheckout()">✕</button>
+      <button class="modal-close" onclick="closeCheckout()" aria-label="Close checkout">✕</button>
     </div>
     <div class="modal-body" id="checkoutBody"></div>
   </div>
@@ -1002,16 +1095,16 @@ footer {
   </ul>
   <div class="nav-actions">
     <button class="nav-btn nav-btn-ghost" style="display:none" id="desktopAdminBtn" onclick="window.location='admin.html'">Admin</button>
-    <button class="nav-btn nav-btn-primary" onclick="openCart()" style="position:relative">
+    <button class="nav-btn nav-btn-primary" onclick="openCart()" style="position:relative" aria-label="Open cart">
       Cart
-      <span class="cart-badge" id="cartBadge">0</span>
+      <span class="cart-badge" id="cartBadge" aria-live="polite">0</span>
     </button>
-    <button class="nav-toggle" id="navToggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+    <button class="nav-toggle" id="navToggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
   </div>
 </nav>
 
 <!-- Hero -->
-<section class="hero" id="home">
+<section class="hero" id="home" role="banner">
   <div class="hero-bg"></div>
   <div class="hero-grid-lines"></div>
   <p class="hero-eyebrow">Faith · Fitness · Purpose</p>
@@ -1023,7 +1116,7 @@ footer {
   </p>
   <div class="hero-actions">
     <button class="btn-xl btn-xl-white" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Shop the Collection</button>
-    <button class="btn-xl btn-xl-outline" onclick="document.getElementById('pif-section').scrollIntoView({behavior:'smooth'})">🕊️ Pay it Forward</button>
+    <button class="btn-xl btn-xl-gold" onclick="document.getElementById('pif-section').scrollIntoView({behavior:'smooth'})">Pay it Forward ✦</button>
   </div>
   <p class="hero-verse">"Do you not know that your bodies are temples of the Holy Spirit?" — 1 Corinthians 6:19</p>
 </section>
@@ -1063,7 +1156,7 @@ footer {
 </div>
 
 <!-- Products -->
-<section class="section products-section" id="shop">
+<section class="section products-section" id="shop" id="main-content">
   <div class="products-header">
     <div>
       <p class="section-label reveal">Featured Products</p>
@@ -1196,11 +1289,12 @@ footer {
     <p class="section-label reveal" style="justify-content:center">Stay Connected</p>
     <h2 class="section-title reveal" style="text-align:center">Join the <em>Vitality Community</em></h2>
     <p class="section-desc reveal" style="text-align:center;margin:0 auto 0">Weekly devotionals, wellness tips, early access, and 15% off your first order.</p>
-    <div class="newsletter-form reveal">
-      <input type="email" placeholder="Enter your email address">
-      <button class="btn-subscribe">Subscribe</button>
-    </div>
-    <p class="newsletter-note">🕊️ No spam, ever. You can unsubscribe anytime.</p>
+    <form class="newsletter-form reveal" onsubmit="return false">
+      <label for="newsletterEmail" class="sr-only">Email address</label>
+      <input type="email" id="newsletterEmail" placeholder="Enter your email address" autocomplete="email" required>
+      <button class="btn-subscribe" type="submit">Subscribe →</button>
+    </form>
+    <p class="newsletter-note">No spam, ever. Unsubscribe anytime.</p>
   </div>
 </section>
 
@@ -1608,12 +1702,12 @@ function renderProducts(filter) {
   }
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" data-cat="${p.cat}">
-      <div class="product-media" style="background:${p.bg||'var(--black-3)'}">
-        <div class="product-emoji">${p.emoji||'✦'}</div>
-        ${p.tag ? `<div class="product-tag tag-${p.tag}">${p.tag}</div>` : ''}
-        ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85">` : ''}
-        <button class="product-add-btn" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"✦",tag:p.tag||""})});openCart()'>
-          Add to Cart +
+      <div class="product-media img-skeleton" style="background:${p.bg||'var(--black-3)'}">
+        ${!p.mediaUrl ? `<div class="product-emoji" aria-hidden="true">${p.emoji||'✦'}</div>` : ''}
+        ${p.tag ? `<div class="product-tag tag-${p.tag}" aria-label="${p.tag} product">${p.tag}</div>` : ''}
+        ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onload="this.classList.add('loaded');this.closest('.product-media').classList.remove('img-skeleton')">` : ''}
+        <button class="product-add-btn" aria-label="Add ${p.name} to cart" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"✦",tag:p.tag||""})});openCart()'>
+          Add to Cart
         </button>
       </div>
       <div class="product-body">
@@ -1624,7 +1718,7 @@ function renderProducts(filter) {
           <div class="product-price">
             ${p.oldPrice ? `<span class="product-price-old">$${p.oldPrice}</span>` : ''}$${p.price}
           </div>
-          <button class="product-wish" onclick="this.classList.toggle('active');this.textContent=this.classList.contains('active')?'♥':'♡'">♡</button>
+          <button class="product-wish" aria-label="Add to wishlist" onclick="this.classList.toggle('active');this.textContent=this.classList.contains('active')?'♥':'♡';this.setAttribute('aria-pressed',this.classList.contains('active'))">♡</button>
         </div>
       </div>
     </div>
@@ -1656,11 +1750,26 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 /* ─── SCROLL TOP ─── */
 function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
+/* ─── NAV SCROLL STATE ─── */
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('mainNav');
+  if (nav) nav.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+/* ─── LAZY IMAGE LOAD (fade-in) ─── */
+function initLazyImages() {
+  document.querySelectorAll('.product-media img').forEach(img => {
+    if (img.complete) { img.classList.add('loaded'); }
+    else { img.addEventListener('load', () => img.classList.add('loaded')); }
+  });
+}
+
 /* ─── INIT ─── */
 window.addEventListener('DOMContentLoaded', async () => {
   renderProducts('all');
   buildMarquee();
   await updatePifStat();
+  initLazyImages();
 });
 </script>
 </body>
