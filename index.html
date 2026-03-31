@@ -1320,7 +1320,10 @@ const DEFAULT_PRODUCTS = [
 function getProducts() {
   try {
     const s = localStorage.getItem('vv_products');
-    return s ? JSON.parse(s) : DEFAULT_PRODUCTS;
+    if (!s) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    const parsed = JSON.parse(s);
+    if (!Array.isArray(parsed) || parsed.length === 0) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    return parsed;
   } catch { return DEFAULT_PRODUCTS; }
 }
 

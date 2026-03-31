@@ -398,6 +398,7 @@ a{text-decoration:none;color:inherit}
       <div class="topbar-title" id="topbarTitle">Products</div>
       <div class="topbar-actions">
         <a href="index.html" class="btn-sm btn-sm-ghost">View Store ↗</a>
+        <button class="btn-sm btn-sm-ghost" id="topbarResetBtn" onclick="resetToDefaults()" title="Restore all default products">↺ Reset Defaults</button>
         <button class="btn-sm btn-sm-white" id="topbarAddBtn" onclick="openAddProduct()">+ Add Product</button>
       </div>
     </div>
@@ -523,15 +524,45 @@ const DEFAULT_PRODUCTS = [
   { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'✨', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10', active:true },
   { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'📓', tag:'', verse:'Track habits, prayers, workouts, and scripture.', active:true },
   { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'🎧', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.', active:true },
+  { id:'philippians-tee', name:'All Things Through Christ Tee', cat:'apparel', price:34, emoji:'🖤', tag:'new', verse:'"I can do all things through Christ who strengthens me" — Phil. 4:13', mediaUrl:'images/IMG_4602.jpeg', mediaUrls:['images/IMG_4602.jpeg'], active:true },
+  { id:'gym-bible-tee', name:'Gym & Bible Tee', cat:'apparel', price:32, emoji:'💙', tag:'', verse:'Two essentials for the faith-driven life.', mediaUrl:'images/IMG_4603.jpeg', mediaUrls:['images/IMG_4603.jpeg'], active:true },
+  { id:'gods-love-tee', name:"God's Love Has No Limits Tee", cat:'apparel', price:30, emoji:'🤍', tag:'', verse:'"Nothing can separate us from the love of God." — Romans 8:38', mediaUrl:'images/IMG_4604.jpeg', mediaUrls:['images/IMG_4604.jpeg'], active:true },
+  { id:'strength-dignity-tee', name:'Strength & Dignity Performance Tee', cat:'apparel', price:36, emoji:'💙', tag:'new', verse:'"She is clothed with strength and dignity" — Proverbs 31:25', mediaUrl:'images/IMG_4606.jpeg', mediaUrls:['images/IMG_4606.jpeg'], active:true },
+  { id:'faith-over-fear-tank', name:'Faith Over Fear Tank Top', cat:'apparel', price:28, emoji:'💧', tag:'', verse:'"For God has not given us a spirit of fear." — 2 Timothy 1:7', mediaUrl:'images/IMG_4607.jpeg', mediaUrls:['images/IMG_4607.jpeg'], active:true },
+  { id:'walk-in-faith-bra', name:'Walk in Faith Sports Bra', cat:'apparel', price:38, oldPrice:48, emoji:'🩷', tag:'sale', verse:'"We walk by faith, not by sight." — 2 Corinthians 5:7', mediaUrl:'images/IMG_4608.jpeg', mediaUrls:['images/IMG_4608.jpeg'], active:true },
+  { id:'weak-strong-tee', name:'When I Am Weak Tee', cat:'apparel', price:32, emoji:'🤍', tag:'', verse:'"For when I am weak, then I am strong." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4610.jpeg', mediaUrls:['images/IMG_4610.jpeg'], active:true },
+  { id:'grace-water-bottle', name:'His Grace Water Bottle', cat:'accessories', price:35, emoji:'🌸', tag:'new', verse:'"His grace is sufficient for me." — 2 Corinthians 12:9', mediaUrl:'images/IMG_4611.jpeg', mediaUrls:['images/IMG_4611.jpeg'], active:true },
+  { id:'be-strong-bottle', name:'Be Strong & Courageous Bottle', cat:'accessories', price:38, emoji:'🖤', tag:'', verse:'"Be strong and courageous." — Joshua 1:9', mediaUrl:'images/IMG_4612.jpeg', mediaUrls:['images/IMG_4612.jpeg'], active:true },
+  { id:'lgs-shaker', name:"Let's Get Serious Shaker", cat:'accessories', price:22, emoji:'🥛', tag:'', verse:"Let's get serious for Jesus. Train with purpose.", mediaUrl:'images/IMG_4613.jpeg', mediaUrls:['images/IMG_4613.jpeg'], active:true },
+  { id:'psalm-water-bottle', name:'God Is Within Her Water Bottle', cat:'accessories', price:28, emoji:'✨', tag:'', verse:'"God is within her, she will not fall." — Psalm 46:5', mediaUrl:'images/IMG_4614.jpeg', mediaUrls:['images/IMG_4614.jpeg'], active:true },
+  { id:'body-of-worship', name:'A Body of Worship', cat:'devotional', price:18, emoji:'📗', tag:'', verse:'A fitness devotional to help you serve God longer & stronger. By Kara Bruegger.', mediaUrl:'images/IMG_4615.jpeg', mediaUrls:['images/IMG_4615.jpeg'], active:true },
+  { id:'faithfully-fit', name:'Faithfully Fit', cat:'devotional', price:16, emoji:'📘', tag:'', verse:'A 40-Day Devotional Plan to End the Yo-Yo Lifestyle of Chronic Dieting.', mediaUrl:'images/IMG_4617.jpeg', mediaUrls:['images/IMG_4617.jpeg'], active:true },
+  { id:'40-days-faith-fitness', name:'40 Days of Faith and Fitness', cat:'devotional', price:14, emoji:'📙', tag:'', verse:'A Devotional Journal to align your faith and fitness journey. By Marsha Apsley.', mediaUrl:'images/IMG_4618.jpeg', mediaUrls:['images/IMG_4618.jpeg'], active:true },
+  { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'📓', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg', mediaUrls:['images/IMG_4619.jpeg'], active:true },
+  { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'🏋️', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg', mediaUrls:['images/IMG_4620.jpeg'], active:true },
+  { id:'dcul-womens', name:"DC-UL 1.0 — Women's Edition", cat:'digital', price:39, emoji:'💜', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg', mediaUrls:['images/IMG_4621.jpeg'], active:true },
 ];
 
 function getProducts() {
-  try { const s = localStorage.getItem('vv_products'); return s ? JSON.parse(s) : DEFAULT_PRODUCTS; } catch { return DEFAULT_PRODUCTS; }
+  try {
+    const s = localStorage.getItem('vv_products');
+    if (!s) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    const parsed = JSON.parse(s);
+    if (!Array.isArray(parsed) || parsed.length === 0) { localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS)); return DEFAULT_PRODUCTS; }
+    return parsed;
+  } catch { return DEFAULT_PRODUCTS; }
 }
 function saveProducts(prods) {
   localStorage.setItem('vv_products', JSON.stringify(prods));
   updateStats();
   renderTable();
+}
+function resetToDefaults() {
+  if (!confirm('Reset all products to defaults? This will remove any custom products you have added.')) return;
+  localStorage.setItem('vv_products', JSON.stringify(DEFAULT_PRODUCTS));
+  updateStats();
+  renderTable();
+  notify('Products reset to defaults (' + DEFAULT_PRODUCTS.length + ' products)', 'success');
 }
 
 // PIF
