@@ -348,6 +348,11 @@ nav.scrolled {
   background: var(--black-3);
   display: flex; align-items: center; justify-content: center;
 }
+.product-media-button {
+  position: absolute; inset: 0;
+  border: none; background: transparent; padding: 0;
+  z-index: 1;
+}
 .product-emoji {
   font-size: 5rem; transition: transform 0.5s ease;
   user-select: none; pointer-events: none;
@@ -803,6 +808,61 @@ footer {
   position: relative;
 }
 .modal-overlay.open .modal { transform: translateY(0); }
+.gallery-overlay {
+  position: fixed; inset: 0; z-index: 320;
+  background: rgba(5,5,5,0.92); backdrop-filter: blur(12px);
+  opacity: 0; pointer-events: none; transition: opacity var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.gallery-overlay.open { opacity: 1; pointer-events: all; }
+.gallery-modal {
+  width: min(1200px, 100%); max-height: 92vh; overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr) 320px;
+  background: rgba(17,17,17,0.96);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: var(--shadow-elevated);
+}
+.gallery-stage {
+  position: relative; min-height: 70vh; overflow: hidden;
+  background: #050505; display: flex; align-items: center; justify-content: center;
+}
+.gallery-main {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  transition: transform 0.25s ease; cursor: zoom-in;
+}
+.gallery-stage.zoomed .gallery-main { transform: scale(1.9); cursor: zoom-out; }
+.gallery-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10,10,10,0.72); color: var(--white);
+  font-size: 1.4rem; z-index: 2;
+}
+.gallery-nav.prev { left: 20px; }
+.gallery-nav.next { right: 20px; }
+.gallery-panel {
+  border-left: 1px solid rgba(255,255,255,0.08);
+  padding: 24px; display: flex; flex-direction: column; gap: 18px;
+}
+.gallery-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+}
+.gallery-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; line-height: 1.2; }
+.gallery-count { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.gallery-meta, .gallery-zoom-hint { font-size: 0.8rem; color: var(--grey-4); line-height: 1.7; }
+.gallery-close {
+  width: 40px; height: 40px; border: 1px solid var(--grey-2);
+  background: var(--black-3); color: var(--grey-4); flex-shrink: 0;
+}
+.gallery-thumbs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gallery-thumb {
+  aspect-ratio: 4/5; border: 1px solid rgba(255,255,255,0.08);
+  background: var(--black-3); padding: 0; overflow: hidden;
+}
+.gallery-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.75; transition: opacity var(--transition), transform var(--transition); }
+.gallery-thumb.active { border-color: var(--gold); }
+.gallery-thumb.active img, .gallery-thumb:hover img { opacity: 1; transform: scale(1.03); }
 .modal-head {
   padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.08);
   display: flex; justify-content: space-between; align-items: center;
@@ -1033,6 +1093,10 @@ footer {
   .newsletter-form { flex-direction: column; }
   .form-row { grid-template-columns: 1fr; }
   .callout-metrics { grid-template-columns: repeat(2, 1fr); }
+  .gallery-modal { grid-template-columns: 1fr; }
+  .gallery-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+  .gallery-stage { min-height: 50vh; }
+  .gallery-thumbs { grid-template-columns: repeat(4, 1fr); }
 }
 @media (max-width: 480px) {
   nav { padding: 0 16px; }
@@ -1083,6 +1147,28 @@ footer {
       <button class="modal-close" onclick="closeCheckout()" aria-label="Close checkout">✕</button>
     </div>
     <div class="modal-body" id="checkoutBody"></div>
+  </div>
+</div>
+
+<div class="gallery-overlay" id="galleryOverlay" onclick="closeProductGallery(event)">
+  <div class="gallery-modal" onclick="event.stopPropagation()">
+    <div class="gallery-stage" id="galleryStage">
+      <button class="gallery-nav prev" id="galleryPrev" onclick="changeGallerySlide(-1)" aria-label="Previous image">‹</button>
+      <img class="gallery-main" id="galleryMainImage" alt="">
+      <button class="gallery-nav next" id="galleryNext" onclick="changeGallerySlide(1)" aria-label="Next image">›</button>
+    </div>
+    <div class="gallery-panel">
+      <div class="gallery-head">
+        <div>
+          <div class="gallery-count" id="galleryCount"></div>
+          <div class="gallery-title" id="galleryTitle"></div>
+        </div>
+        <button class="gallery-close" onclick="closeProductGallery()" aria-label="Close gallery">✕</button>
+      </div>
+      <div class="gallery-meta" id="galleryMeta"></div>
+      <div class="gallery-zoom-hint">Click on the photo to zoom. Use the arrows to browse more photos.</div>
+      <div class="gallery-thumbs" id="galleryThumbs"></div>
+    </div>
   </div>
 </div>
 
@@ -1415,9 +1501,11 @@ const DEFAULT_PRODUCTS = [
 ];
 
 function normalizeProduct(product) {
-  const mediaUrl = product.mediaUrl || product.mediaUrls?.[0] || '';
+  const mediaUrls = (product.mediaUrls || []).filter(Boolean);
+  const mediaUrl = product.mediaUrl || mediaUrls[0] || '';
   return {
     ...product,
+    mediaUrls: mediaUrls.length ? mediaUrls : (mediaUrl ? [mediaUrl] : []),
     mediaUrl: mediaUrl || null,
     emoji: mediaUrl ? '' : (product.emoji || ''),
   };
@@ -1460,19 +1548,33 @@ async function getPifCredits() {
     return parseFloat(localStorage.getItem('vv_pif') || '0');
   }
 }
+async function getPifUsed() {
+  try {
+    const r = await window.storage.get('pif_used');
+    return r ? parseInt(r.value) : parseInt(localStorage.getItem('vv_pif_used') || '0');
+  } catch {
+    return parseInt(localStorage.getItem('vv_pif_used') || '0');
+  }
+}
 async function setPifCredits(val) {
   try { await window.storage.set('pif_credits', String(val), true); } catch {}
   localStorage.setItem('vv_pif', String(val));
   updatePifStat();
 }
+async function setPifUsed(val) {
+  try { await window.storage.set('pif_used', String(val), true); } catch {}
+  localStorage.setItem('vv_pif_used', String(val));
+}
 async function addPifCredits(amt) {
   const cur = await getPifCredits();
   await setPifCredits(cur + amt);
 }
-async function usePifCredit() {
+async function usePifCredit(amount) {
   const cur = await getPifCredits();
-  if (cur <= 0) return false;
-  await setPifCredits(Math.max(0, cur - 1));
+  if (cur < amount) return false;
+  await setPifCredits(Math.max(0, cur - amount));
+  const used = await getPifUsed();
+  await setPifUsed(used + 1);
   return true;
 }
 async function updatePifStat() {
@@ -1500,6 +1602,8 @@ async function incrementPifCount() {
 
 /* ─── CART ─── */
 let cart = [];
+let galleryProduct = null;
+let galleryIndex = 0;
 function openCart() { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('open'); renderCart(); }
 function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); }
 
@@ -1558,10 +1662,8 @@ let checkoutStep = 0; // 0=contact, 1=shipping, 2=payment, 3=pif/gift
 async function openCheckout() {
   closeCart();
   checkoutStep = 0;
-  // Check if there are PIF credits first
   const credits = await getPifCredits();
-  if (credits > 0) {
-    // Show gift received screen
+  if (credits >= cartTotal() && cartTotal() > 0) {
     showGiftScreen();
   } else {
     showCheckoutStep(0);
@@ -1713,12 +1815,78 @@ function showGiftScreen() {
 }
 
 async function useCreditAndShowPif() {
-  await usePifCredit();
+  const total = cartTotal();
+  const applied = await usePifCredit(total);
+  if (!applied) {
+    await updatePifStat();
+    showCheckoutStep(0);
+    return;
+  }
+  await updatePifStat();
   showPifStep();
 }
 async function useCreditAndComplete() {
-  await usePifCredit();
+  const total = cartTotal();
+  const applied = await usePifCredit(total);
+  if (!applied) {
+    await updatePifStat();
+    showCheckoutStep(0);
+    return;
+  }
+  await updatePifStat();
   completePurchase(false);
+}
+
+function openProductGallery(productId, startIndex = 0) {
+  const product = getProducts().find(p => p.id === productId);
+  if (!product || !product.mediaUrls?.length) return;
+  galleryProduct = product;
+  galleryIndex = Math.max(0, Math.min(startIndex, product.mediaUrls.length - 1));
+  document.getElementById('galleryOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderGallery();
+}
+
+function closeProductGallery(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('galleryOverlay').classList.remove('open');
+  document.getElementById('galleryStage').classList.remove('zoomed');
+  document.body.style.overflow = '';
+  galleryProduct = null;
+}
+
+function renderGallery() {
+  if (!galleryProduct) return;
+  const stage = document.getElementById('galleryStage');
+  const mainImage = document.getElementById('galleryMainImage');
+  const currentUrl = galleryProduct.mediaUrls[galleryIndex];
+  stage.classList.remove('zoomed');
+  mainImage.src = currentUrl;
+  mainImage.alt = galleryProduct.name;
+  mainImage.onclick = () => stage.classList.toggle('zoomed');
+  document.getElementById('galleryTitle').textContent = galleryProduct.name;
+  document.getElementById('galleryMeta').textContent = galleryProduct.verse || 'Product photo gallery.';
+  document.getElementById('galleryCount').textContent = `${galleryIndex + 1} / ${galleryProduct.mediaUrls.length}`;
+  document.getElementById('galleryThumbs').innerHTML = galleryProduct.mediaUrls.map((url, index) => `
+    <button class="gallery-thumb ${index === galleryIndex ? 'active' : ''}" onclick="setGallerySlide(${index})" aria-label="View image ${index + 1}">
+      <img src="${url}" alt="${galleryProduct.name} image ${index + 1}">
+    </button>
+  `).join('');
+  const hasMultiple = galleryProduct.mediaUrls.length > 1;
+  document.getElementById('galleryPrev').style.display = hasMultiple ? 'flex' : 'none';
+  document.getElementById('galleryNext').style.display = hasMultiple ? 'flex' : 'none';
+}
+
+function setGallerySlide(index) {
+  if (!galleryProduct) return;
+  galleryIndex = index;
+  renderGallery();
+}
+
+function changeGallerySlide(delta) {
+  if (!galleryProduct) return;
+  galleryIndex = (galleryIndex + delta + galleryProduct.mediaUrls.length) % galleryProduct.mediaUrls.length;
+  renderGallery();
 }
 
 /* ─── PRODUCTS RENDER ─── */
@@ -1733,6 +1901,7 @@ function renderProducts(filter) {
   grid.innerHTML = filtered.map(p => `
     <div class="product-card" data-cat="${p.cat}">
       <div class="product-media img-skeleton" style="background:${p.bg||'var(--black-3)'}">
+        ${p.mediaUrl ? `<button type="button" class="product-media-button" onclick="openProductGallery('${p.id}')" aria-label="Open image gallery for ${p.name}"></button>` : ''}
         ${!p.mediaUrl && p.emoji ? `<div class="product-emoji" aria-hidden="true">${p.emoji}</div>` : ''}
         ${p.tag ? `<div class="product-tag tag-${p.tag}" aria-label="${p.tag} product">${p.tag}</div>` : ''}
         ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onload="this.classList.add('loaded');this.closest('.product-media').classList.remove('img-skeleton')">` : ''}
@@ -1794,12 +1963,24 @@ function initLazyImages() {
   });
 }
 
+function syncPifFromStorage(event) {
+  if (event && !['vv_pif', 'vv_pif_count', 'vv_pif_used'].includes(event.key)) return;
+  updatePifStat();
+}
+
 /* ─── INIT ─── */
 window.addEventListener('DOMContentLoaded', async () => {
   renderProducts('all');
   buildMarquee();
   await updatePifStat();
   initLazyImages();
+});
+window.addEventListener('storage', syncPifFromStorage);
+window.addEventListener('keydown', (event) => {
+  if (!document.getElementById('galleryOverlay').classList.contains('open')) return;
+  if (event.key === 'Escape') closeProductGallery();
+  if (event.key === 'ArrowLeft') changeGallerySlide(-1);
+  if (event.key === 'ArrowRight') changeGallerySlide(1);
 });
 </script>
 </body>

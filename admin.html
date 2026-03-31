@@ -604,7 +604,9 @@ async function getPifCredits() {
 async function getPifCount() {
   try { const r = await window.storage.get('pif_count'); return r ? parseInt(r.value) : parseInt(localStorage.getItem('vv_pif_count')||'0'); } catch { return parseInt(localStorage.getItem('vv_pif_count')||'0'); }
 }
-async function getPifUsed() { return parseInt(localStorage.getItem('vv_pif_used')||'0'); }
+async function getPifUsed() {
+  try { const r = await window.storage.get('pif_used'); return r ? parseInt(r.value) : parseInt(localStorage.getItem('vv_pif_used')||'0'); } catch { return parseInt(localStorage.getItem('vv_pif_used')||'0'); }
+}
 async function setPifCredits(v) {
   try { await window.storage.set('pif_credits', String(v), true); } catch {}
   localStorage.setItem('vv_pif', String(v));
@@ -890,9 +892,16 @@ async function confirmAddCredit() {
 async function resetPifCredits() {
   if (!confirm('Reset all PIF credits to $0? This cannot be undone.')) return;
   await setPifCredits(0);
+  try { await window.storage.set('pif_used', '0', true); } catch {}
+  localStorage.setItem('vv_pif_used', '0');
   pifLog.push({ type: 'reset', amount: 0, note: 'Admin reset', time: new Date().toLocaleTimeString() });
   updatePifLog();
   notify('PIF credits reset to $0', 'success');
+}
+
+function syncPifDisplay(event) {
+  if (event && !['vv_pif', 'vv_pif_count', 'vv_pif_used'].includes(event.key)) return;
+  updatePifDisplay();
 }
 
 /* ─── NOTIFY ─── */
@@ -909,6 +918,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   updateStats();
   await updatePifDisplay();
   updatePifLog();
+});
+window.addEventListener('storage', syncPifDisplay);
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) updatePifDisplay();
 });
 </script>
 </body>
