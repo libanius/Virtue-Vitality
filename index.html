@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="V&V">
+<link rel="manifest" href="manifest.json">
+<title>Virtue & Vitality — Faith · Fitness · Purpose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   EIGHT SLEEP DESIGN SYSTEM — V&V ADAPTED
+   Dark, premium, editorial, data-forward
+═══════════════════════════════════════════ */
+:root {
+  --black: #0a0a0a;
+  --black-2: #111111;
+  --black-3: #1a1a1a;
+  --black-4: #222222;
+  --grey-1: #2a2a2a;
+  --grey-2: #3a3a3a;
+  --grey-3: #555555;
+  --grey-4: #888888;
+  --grey-5: #aaaaaa;
+  --white: #ffffff;
+  --off-white: #f5f5f5;
+  --gold: #c9a96e;
+  --gold-2: #e8d5b0;
+  --gold-dim: rgba(201,169,110,0.15);
+  --sage: #7a9e7e;
+  --radius: 2px;
+  --nav-h: 64px;
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button { cursor: pointer; font-family: inherit; }
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--black-2); }
+::-webkit-scrollbar-thumb { background: var(--grey-2); border-radius: 2px; }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background var(--transition);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; letter-spacing: 0.04em;
+  color: var(--white); font-weight: 400;
+}
+.nav-logo span { color: var(--gold); }
+.nav-links {
+  display: flex; gap: 0; list-style: none;
+}
+.nav-links a {
+  display: block; padding: 0 16px; height: var(--nav-h);
+  line-height: var(--nav-h);
+  font-size: 0.8rem; font-weight: 400; letter-spacing: 0.02em;
+  color: var(--grey-5); transition: color var(--transition);
+  white-space: nowrap;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.nav-btn {
+  height: 36px; padding: 0 18px;
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.04em;
+  border: none; transition: all var(--transition);
+  white-space: nowrap;
+}
+.nav-btn-ghost {
+  background: transparent; color: var(--grey-5);
+  border: 1px solid var(--grey-2);
+}
+.nav-btn-ghost:hover { border-color: var(--grey-4); color: var(--white); }
+.nav-btn-primary {
+  background: var(--white); color: var(--black);
+  position: relative; overflow: hidden;
+}
+.nav-btn-primary:hover { background: var(--off-white); }
+.cart-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: var(--gold); color: var(--black);
+  width: 16px; height: 16px; border-radius: 50%;
+  font-size: 0.6rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-toggle {
+  display: none; background: none; border: none;
+  color: var(--white); font-size: 1.4rem; padding: 4px;
+}
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  padding: calc(var(--nav-h) + 60px) 32px 80px;
+  text-align: center;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 60%, rgba(201,169,110,0.07) 0%, transparent 70%),
+              radial-gradient(ellipse 50% 50% at 20% 80%, rgba(122,158,126,0.05) 0%, transparent 60%);
+}
+.hero-grid-lines {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 28px;
+  opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; width: 24px; height: 1px; background: var(--gold); opacity: 0.5;
+}
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 7vw, 6.5rem);
+  font-weight: 400; line-height: 1.08;
+  letter-spacing: -0.01em;
+  max-width: 900px; margin: 0 auto 24px;
+  opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
+}
+.hero-title em { font-style: italic; color: var(--gold); }
+.hero-sub {
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: var(--grey-4); line-height: 1.7;
+  max-width: 520px; margin: 0 auto 48px;
+  opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+}
+.hero-actions {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
+}
+.btn-xl {
+  height: 52px; padding: 0 32px;
+  font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em;
+  border: none; transition: all var(--transition);
+}
+.btn-xl-white { background: var(--white); color: var(--black); }
+.btn-xl-white:hover { background: var(--off-white); transform: translateY(-1px); }
+.btn-xl-outline {
+  background: transparent; color: var(--white);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.btn-xl-outline:hover { border-color: rgba(255,255,255,0.5); transform: translateY(-1px); }
+.hero-verse {
+  margin-top: 64px; font-size: 0.8rem; color: var(--grey-3);
+  font-style: italic; letter-spacing: 0.02em;
+  opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+}
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  background: var(--black-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 0 32px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+}
+.stat-item {
+  padding: 28px 0;
+  display: flex; flex-direction: column; align-items: center;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  gap: 4px;
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem; color: var(--white); line-height: 1;
+}
+.stat-num span { color: var(--gold); }
+.stat-label { font-size: 0.72rem; color: var(--grey-4); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ─── TRUST STRIP ─── */
+.trust-strip {
+  padding: 20px 32px;
+  background: var(--black-3);
+  display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.trust-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.78rem; color: var(--grey-4);
+}
+.trust-item span:first-child { font-size: 1rem; }
+
+/* ─── SECTION COMMON ─── */
+.section { padding: 100px 32px; }
+.section-label {
+  font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 400; line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+.section-desc {
+  font-size: 0.95rem; color: var(--grey-4); line-height: 1.75;
+  max-width: 540px;
+}
+
+/* ─── PRODUCTS ─── */
+.products-section { background: var(--black); }
+.products-header {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 48px; gap: 24px; flex-wrap: wrap;
+}
+.filter-row {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-top: 20px;
+}
+.filter-chip {
+  height: 32px; padding: 0 14px;
+  font-size: 0.75rem; font-weight: 400; letter-spacing: 0.04em;
+  background: transparent; color: var(--grey-4);
+  border: 1px solid var(--grey-2);
+  transition: all var(--transition);
+}
+.filter-chip:hover { border-color: var(--grey-3); color: var(--white); }
+.filter-chip.active { background: var(--white); color: var(--black); border-color: var(--white); }
+.products-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+.product-card {
+  background: var(--black-2);
+  position: relative; overflow: hidden;
+  transition: background var(--transition);
+}
+.product-card:hover { background: var(--black-3); }
+.product-media {
+  aspect-ratio: 4/5; position: relative; overflow: hidden;
+  background: var(--black-3);
+  display: flex; align-items: center; justify-content: center;
+}
+.product-emoji {
+  font-size: 5rem; transition: transform 0.5s ease;
+  user-select: none; pointer-events: none;
+}
+.product-card:hover .product-emoji { transform: scale(1.08); }
+.product-media-bg {
+  position: absolute; inset: 0;
+  transition: transform 0.5s ease;
+}
+.product-tag {
+  position: absolute; top: 16px; left: 16px;
+  height: 24px; padding: 0 10px;
+  font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+  font-weight: 500; display: flex; align-items: center;
+}
+.tag-new { background: var(--white); color: var(--black); }
+.tag-sale { background: var(--gold); color: var(--black); }
+.tag-digital { background: var(--sage); color: var(--white); }
+.product-add-btn {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 48px; background: rgba(10,10,10,0.95);
+  font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em;
+  color: var(--white); border: none;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.product-card:hover .product-add-btn { transform: translateY(0); }
+.product-add-btn:hover { background: var(--white); color: var(--black); }
+.product-body { padding: 20px 24px 24px; }
+.product-cat {
+  font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--grey-3); margin-bottom: 6px;
+}
+.product-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem; font-weight: 400;
+  margin-bottom: 8px; line-height: 1.3;
+}
+.product-verse {
+  font-size: 0.78rem; color: var(--grey-4);
+  font-style: italic; line-height: 1.6; margin-bottom: 16px;
+}
+.product-bottom {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.product-price { font-size: 1.1rem; font-weight: 500; }
+.product-price-old {
+  font-size: 0.85rem; color: var(--grey-3);
+  text-decoration: line-through; margin-right: 6px;
+}
+.product-wish {
+  background: none; border: none; font-size: 1.1rem;
+  color: var(--grey-3); transition: all 0.2s;
+  padding: 4px;
+}
+.product-wish:hover { color: var(--gold); transform: scale(1.2); }
+.product-wish.active { color: var(--gold); }
+
+/* ─── MARQUEE ─── */
+.marquee {
+  background: var(--black-2); overflow: hidden;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 0;
+}
+.marquee-track {
+  display: inline-flex; gap: 0; white-space: nowrap;
+  animation: marquee 40s linear infinite;
+}
+.marquee-item {
+  display: inline-flex; align-items: center; gap: 20px;
+  padding: 0 20px; font-size: 0.72rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--grey-4);
+}
+.marquee-sep { color: var(--gold); font-size: 0.5rem; }
+
+/* ─── FEATURED CALLOUT ─── */
+.callout {
+  background: var(--black-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.callout-inner {
+  max-width: 1400px; margin: 0 auto;
+  padding: 100px 32px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  align-items: center;
+}
+.callout-visual {
+  aspect-ratio: 1/1; background: var(--black-3);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.callout-visual-inner { font-size: 7rem; animation: float 4s ease-in-out infinite; }
+.callout-visual-cross {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.04;
+}
+.callout-visual-cross svg { width: 60%; }
+.callout-metrics {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+  background: rgba(255,255,255,0.06); margin-top: 40px;
+}
+.metric {
+  padding: 20px; background: var(--black-2);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.metric-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem; color: var(--gold);
+}
+.metric-label { font-size: 0.72rem; color: var(--grey-4); letter-spacing: 0.06em; }
+
+/* ─── CATEGORIES ─── */
+.categories-section { background: var(--black); padding: 0 0 100px; }
+.categories-header { padding: 100px 32px 48px; }
+.categories-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0 0;
+}
+.cat-card {
+  background: var(--black-2); position: relative;
+  overflow: hidden; aspect-ratio: 3/4;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 24px; cursor: pointer;
+  transition: background var(--transition);
+}
+.cat-card:hover { background: var(--black-3); }
+.cat-card-bg {
+  position: absolute; inset: 0; transition: transform 0.5s ease;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 5rem; opacity: 0.15;
+}
+.cat-card:hover .cat-card-bg { transform: scale(1.1); }
+.cat-card-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,10,10,0.9) 0%, rgba(10,10,10,0.2) 60%, transparent 100%);
+}
+.cat-card-content { position: relative; z-index: 2; }
+.cat-card-label {
+  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 8px;
+}
+.cat-card-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; line-height: 1.25; margin-bottom: 8px;
+}
+.cat-card-count { font-size: 0.75rem; color: var(--grey-4); }
+.cat-card-arrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--white); margin-top: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 2px;
+  transition: gap var(--transition);
+}
+.cat-card:hover .cat-card-arrow { gap: 12px; }
+
+/* ─── PAY IT FORWARD BANNER ─── */
+.pif-banner {
+  background: linear-gradient(135deg, #0d1a0e 0%, #0a0a0a 50%, #1a0d0a 100%);
+  border-top: 1px solid rgba(122,158,126,0.2);
+  border-bottom: 1px solid rgba(201,169,110,0.15);
+  padding: 80px 32px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.pif-banner::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(122,158,126,0.08) 0%, transparent 70%);
+}
+.pif-icon {
+  font-size: 3.5rem; margin: 0 auto 24px;
+  animation: float 3s ease-in-out infinite;
+}
+.pif-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 400; margin-bottom: 16px; position: relative;
+}
+.pif-title em { font-style: italic; color: var(--gold); }
+.pif-desc {
+  font-size: 0.95rem; color: var(--grey-4); line-height: 1.75;
+  max-width: 560px; margin: 0 auto 36px; position: relative;
+}
+.pif-verse {
+  font-size: 0.82rem; color: var(--grey-3); font-style: italic;
+  position: relative; margin-bottom: 36px;
+}
+.pif-learn-btn {
+  height: 48px; padding: 0 28px;
+  background: transparent; color: var(--sage);
+  border: 1px solid var(--sage); font-size: 0.8rem;
+  font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+  transition: all var(--transition); position: relative;
+}
+.pif-learn-btn:hover { background: var(--sage); color: var(--black); }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials-section {
+  background: var(--black-2); padding: 100px 32px;
+}
+.testimonials-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+  background: rgba(255,255,255,0.06); margin-top: 48px;
+}
+.testimonial {
+  background: var(--black-2); padding: 32px;
+  transition: background var(--transition);
+}
+.testimonial:hover { background: var(--black-3); }
+.t-stars { color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 16px; }
+.t-text {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-style: italic;
+  line-height: 1.8; color: var(--grey-5); margin-bottom: 20px;
+}
+.t-author { display: flex; align-items: center; gap: 12px; }
+.t-avatar {
+  width: 40px; height: 40px; border-radius: 50%; overflow: hidden;
+  background: var(--grey-1); display: flex; align-items: center;
+  justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+}
+.t-name { font-size: 0.82rem; font-weight: 500; }
+.t-handle { font-size: 0.72rem; color: var(--grey-4); }
+
+/* ─── NEWSLETTER ─── */
+.newsletter {
+  background: var(--black); padding: 100px 32px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.newsletter-inner {
+  max-width: 600px; margin: 0 auto; text-align: center;
+}
+.newsletter-form {
+  display: flex; gap: 8px; margin-top: 32px;
+}
+.newsletter-form input {
+  flex: 1; height: 48px; padding: 0 16px;
+  background: var(--black-2); border: 1px solid var(--grey-2);
+  color: var(--white); font-family: inherit; font-size: 0.88rem;
+  outline: none; transition: border-color var(--transition);
+}
+.newsletter-form input::placeholder { color: var(--grey-3); }
+.newsletter-form input:focus { border-color: var(--grey-4); }
+.btn-subscribe {
+  height: 48px; padding: 0 24px;
+  background: var(--white); color: var(--black);
+  border: none; font-size: 0.8rem; font-weight: 500;
+  letter-spacing: 0.06em; white-space: nowrap;
+  transition: background var(--transition);
+}
+.btn-subscribe:hover { background: var(--off-white); }
+.newsletter-note { font-size: 0.72rem; color: var(--grey-3); margin-top: 12px; }
+
+/* ─── FOOTER PWA ─── */
+footer {
+  background: var(--black-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 64px 32px 0;
+}
+.footer-top {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px; margin-bottom: 48px;
+}
+.footer-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; margin-bottom: 16px; display: block;
+}
+.footer-logo span { color: var(--gold); }
+.footer-about { font-size: 0.82rem; color: var(--grey-4); line-height: 1.75; margin-bottom: 24px; }
+.footer-social { display: flex; gap: 8px; }
+.social-btn {
+  width: 36px; height: 36px;
+  background: var(--black-3); border: 1px solid var(--grey-2);
+  color: var(--grey-4); font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition); border-radius: 50%;
+}
+.social-btn:hover { background: var(--grey-1); color: var(--white); border-color: var(--grey-3); }
+.footer-col-title {
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--white); font-weight: 500; margin-bottom: 20px;
+}
+.footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.footer-links a { font-size: 0.82rem; color: var(--grey-4); transition: color var(--transition); }
+.footer-links a:hover { color: var(--white); }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 0;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 12px;
+}
+.footer-copy { font-size: 0.75rem; color: var(--grey-3); }
+.footer-payments { display: flex; gap: 6px; }
+.payment-chip {
+  height: 24px; padding: 0 8px;
+  background: var(--black-3); border: 1px solid var(--grey-2);
+  font-size: 0.65rem; color: var(--grey-3); letter-spacing: 0.05em;
+  display: flex; align-items: center;
+}
+
+/* ─── PWA BOTTOM NAV ─── */
+.pwa-nav {
+  display: none; /* shown on mobile via media query */
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 101;
+  background: rgba(17,17,17,0.97);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.pwa-nav-inner {
+  display: flex; justify-content: space-around;
+  padding: 8px 0 4px;
+}
+.pwa-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  background: none; border: none; color: var(--grey-4);
+  font-family: inherit; transition: color var(--transition);
+  padding: 4px 12px; min-width: 56px; position: relative;
+}
+.pwa-btn.active { color: var(--white); }
+.pwa-btn-icon { font-size: 1.2rem; }
+.pwa-btn-label { font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.pwa-btn-cart-count {
+  position: absolute; top: 0; right: 8px;
+  background: var(--gold); color: var(--black);
+  width: 16px; height: 16px; border-radius: 50%;
+  font-size: 0.58rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ─── CART SIDEBAR ─── */
+.cart-overlay {
+  position: fixed; inset: 0; z-index: 199;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  opacity: 0; pointer-events: none; transition: opacity var(--transition);
+}
+.cart-overlay.open { opacity: 1; pointer-events: all; }
+.cart-drawer {
+  position: fixed; top: 0; right: -480px; width: 480px;
+  max-width: 100vw; height: 100%; z-index: 200;
+  background: var(--black-2);
+  border-left: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column;
+  transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.cart-drawer.open { right: 0; }
+.cart-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+}
+.cart-head-title {
+  font-family: 'Playfair Display', serif; font-size: 1.2rem;
+}
+.cart-close {
+  width: 36px; height: 36px; background: var(--black-3);
+  border: 1px solid var(--grey-2); color: var(--grey-4); font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.cart-close:hover { background: var(--grey-1); color: var(--white); }
+.cart-body { flex: 1; overflow-y: auto; padding: 0 24px; }
+.cart-empty {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+  color: var(--grey-3); text-align: center; padding: 40px 0;
+}
+.cart-empty-icon { font-size: 3rem; }
+.cart-empty-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; }
+.cart-item {
+  display: flex; gap: 16px; padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.cart-item-thumb {
+  width: 72px; height: 88px; background: var(--black-3);
+  flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; font-size: 2.2rem;
+}
+.cart-item-info { flex: 1; }
+.cart-item-name { font-family: 'Playfair Display', serif; font-size: 1rem; margin-bottom: 4px; }
+.cart-item-variant { font-size: 0.75rem; color: var(--grey-4); margin-bottom: 12px; }
+.cart-item-qty {
+  display: flex; align-items: center; gap: 12px;
+}
+.qty-btn {
+  width: 28px; height: 28px; background: var(--black-3);
+  border: 1px solid var(--grey-2); color: var(--white);
+  font-size: 1rem; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.qty-btn:hover { background: var(--grey-1); }
+.qty-n { font-size: 0.88rem; min-width: 20px; text-align: center; }
+.cart-item-price { font-size: 1rem; font-weight: 500; flex-shrink: 0; padding-top: 2px; }
+.cart-foot {
+  padding: 20px 24px; flex-shrink: 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.cart-subtotal {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.cart-subtotal-label { font-size: 0.8rem; color: var(--grey-4); letter-spacing: 0.08em; text-transform: uppercase; }
+.cart-subtotal-val { font-family: 'Playfair Display', serif; font-size: 1.5rem; }
+.btn-checkout {
+  width: 100%; height: 52px;
+  background: var(--white); color: var(--black);
+  border: none; font-size: 0.85rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: background var(--transition);
+}
+.btn-checkout:hover { background: var(--off-white); }
+.cart-pif-hint {
+  margin-top: 10px; font-size: 0.72rem; color: var(--grey-4);
+  text-align: center; font-style: italic;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+
+/* ─── CHECKOUT MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+  opacity: 0; pointer-events: none; transition: opacity var(--transition);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--black-2); width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.1);
+  transform: translateY(24px); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-head {
+  padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+  position: sticky; top: 0; background: var(--black-2); z-index: 2;
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; }
+.modal-close {
+  width: 32px; height: 32px; background: var(--black-3);
+  border: 1px solid var(--grey-2); color: var(--grey-4);
+  display: flex; align-items: center; justify-content: center; font-size: 1rem;
+  transition: all var(--transition);
+}
+.modal-close:hover { color: var(--white); background: var(--grey-1); }
+.modal-body { padding: 24px; }
+.checkout-steps {
+  display: flex; gap: 0; margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px;
+}
+.checkout-step {
+  flex: 1; text-align: center; font-size: 0.72rem;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--grey-3); padding-bottom: 12px;
+  border-bottom: 2px solid transparent; margin-bottom: -21px;
+  transition: all var(--transition);
+}
+.checkout-step.active { color: var(--white); border-bottom-color: var(--white); }
+.checkout-step.done { color: var(--gold); border-bottom-color: var(--gold); }
+.form-group { margin-bottom: 16px; }
+.form-label {
+  display: block; font-size: 0.72rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--grey-4); margin-bottom: 6px;
+}
+.form-input {
+  width: 100%; height: 44px; padding: 0 14px;
+  background: var(--black-3); border: 1px solid var(--grey-2);
+  color: var(--white); font-family: inherit; font-size: 0.88rem;
+  outline: none; transition: border-color var(--transition);
+}
+.form-input:focus { border-color: var(--grey-4); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-section-title {
+  font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold); margin: 20px 0 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.form-section-title::before { content: ''; flex: 1; height: 1px; background: rgba(201,169,110,0.2); }
+.order-summary {
+  background: var(--black-3); padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.order-item {
+  display: flex; justify-content: space-between;
+  font-size: 0.85rem; padding: 4px 0; color: var(--grey-5);
+}
+.order-total {
+  display: flex; justify-content: space-between;
+  font-size: 1rem; font-weight: 500;
+  padding-top: 10px; margin-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.btn-confirm {
+  width: 100%; height: 52px;
+  background: var(--white); color: var(--black);
+  border: none; font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: background var(--transition);
+}
+.btn-confirm:hover { background: var(--off-white); }
+.btn-back {
+  width: 100%; height: 44px; margin-top: 10px;
+  background: transparent; color: var(--grey-4);
+  border: 1px solid var(--grey-2); font-size: 0.8rem;
+  letter-spacing: 0.06em; transition: all var(--transition);
+}
+.btn-back:hover { border-color: var(--grey-4); color: var(--white); }
+
+/* ─── PAY IT FORWARD MODAL ─── */
+.pif-modal {
+  background: linear-gradient(160deg, #0d1a0e, #0a0a0a);
+  border-color: rgba(122,158,126,0.3);
+}
+.pif-modal-icon { font-size: 3.5rem; text-align: center; margin-bottom: 20px; }
+.pif-modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6rem; text-align: center; margin-bottom: 12px;
+}
+.pif-modal-title em { font-style: italic; color: var(--gold); }
+.pif-modal-desc {
+  font-size: 0.88rem; color: var(--grey-4); text-align: center;
+  line-height: 1.75; margin-bottom: 28px;
+}
+.pif-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.pif-opt {
+  height: 52px; border: 1px solid var(--grey-2);
+  background: var(--black-3); color: var(--grey-4);
+  font-size: 0.95rem; font-weight: 500;
+  transition: all var(--transition);
+}
+.pif-opt:hover, .pif-opt.active {
+  border-color: var(--sage); color: var(--white);
+  background: rgba(122,158,126,0.1);
+}
+.pif-custom-row {
+  display: flex; gap: 8px; margin-bottom: 20px;
+}
+.pif-custom-row input {
+  flex: 1; height: 44px; padding: 0 14px;
+  background: var(--black-3); border: 1px solid var(--grey-2);
+  color: var(--white); font-family: inherit; font-size: 0.88rem; outline: none;
+  transition: border-color var(--transition);
+}
+.pif-custom-row input:focus { border-color: var(--grey-4); }
+.pif-custom-row input::placeholder { color: var(--grey-3); }
+.btn-pif-yes {
+  width: 100%; height: 52px; margin-bottom: 10px;
+  background: var(--sage); color: var(--white);
+  border: none; font-size: 0.85rem; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: background var(--transition);
+}
+.btn-pif-yes:hover { background: #6a8e6e; }
+.btn-pif-skip {
+  width: 100%; height: 44px;
+  background: transparent; color: var(--grey-4);
+  border: 1px solid var(--grey-2); font-size: 0.8rem;
+  letter-spacing: 0.06em; transition: all var(--transition);
+}
+.btn-pif-skip:hover { border-color: var(--grey-4); color: var(--white); }
+.pif-verse-modal {
+  text-align: center; font-style: italic;
+  font-size: 0.78rem; color: var(--grey-3); margin-top: 16px;
+}
+.pif-counter {
+  text-align: center; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.pif-counter-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; color: var(--sage);
+}
+.pif-counter-label { font-size: 0.75rem; color: var(--grey-4); }
+
+/* ─── GIFT RECEIVED MODAL ─── */
+.gift-modal { text-align: center; }
+.gift-sparkle { font-size: 4rem; margin-bottom: 16px; animation: pulse 2s ease-in-out infinite; }
+.gift-title {
+  font-family: 'Playfair Display', serif; font-size: 1.8rem;
+  margin-bottom: 12px; line-height: 1.2;
+}
+.gift-title em { font-style: italic; color: var(--gold); }
+.gift-desc {
+  font-size: 0.92rem; color: var(--grey-4); line-height: 1.8;
+  margin-bottom: 24px;
+}
+.gift-verse {
+  font-style: italic; font-size: 0.82rem; color: var(--grey-3);
+  border-left: 2px solid var(--gold); padding-left: 14px;
+  text-align: left; margin-bottom: 28px; line-height: 1.6;
+}
+.btn-gift-forward {
+  width: 100%; height: 52px; margin-bottom: 10px;
+  background: var(--gold); color: var(--black);
+  border: none; font-size: 0.85rem; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  transition: background var(--transition);
+}
+.btn-gift-forward:hover { background: #b8985d; }
+.btn-gift-complete {
+  width: 100%; height: 44px;
+  background: transparent; color: var(--grey-4);
+  border: 1px solid var(--grey-2); font-size: 0.8rem;
+  letter-spacing: 0.06em; transition: all var(--transition);
+}
+.btn-gift-complete:hover { color: var(--white); border-color: var(--grey-4); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1100px) {
+  .categories-grid { grid-template-columns: repeat(2, 1fr); }
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  .callout-inner { grid-template-columns: 1fr; gap: 48px; }
+  .callout-visual { max-width: 400px; }
+}
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-toggle { display: flex; }
+  .nav-links.open {
+    display: flex; flex-direction: column;
+    position: fixed; top: var(--nav-h); left: 0; right: 0;
+    background: var(--black-2); padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 99;
+  }
+  .nav-links.open a { height: 44px; line-height: 44px; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .trust-strip { gap: 20px; padding: 16px; }
+  .products-grid { grid-template-columns: 1fr; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+  .categories-grid { grid-template-columns: 1fr 1fr; }
+  .footer-top { grid-template-columns: 1fr; }
+  .section { padding: 64px 20px; }
+  .pwa-nav { display: block; }
+  body { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
+  .newsletter-form { flex-direction: column; }
+  .form-row { grid-template-columns: 1fr; }
+  .callout-metrics { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  nav { padding: 0 16px; }
+  .hero { padding: calc(var(--nav-h) + 40px) 16px 60px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .btn-xl { text-align: center; }
+  .categories-grid { grid-template-columns: 1fr; }
+  .cart-drawer { width: 100vw; }
+  .pif-options { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Cart Overlay -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- Cart Drawer -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-head">
+    <span class="cart-head-title">Your Cart</span>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty" id="cartEmpty">
+      <div class="cart-empty-icon">✦</div>
+      <div class="cart-empty-text">Your cart is empty</div>
+      <div style="font-size:0.78rem;color:var(--grey-3)">Fill it with purpose</div>
+    </div>
+  </div>
+  <div class="cart-foot" id="cartFoot" style="display:none">
+    <div class="cart-subtotal">
+      <span class="cart-subtotal-label">Subtotal</span>
+      <span class="cart-subtotal-val" id="cartTotalVal">$0.00</span>
+    </div>
+    <button class="btn-checkout" onclick="openCheckout()">Proceed to Checkout →</button>
+    <div class="cart-pif-hint">🕊️ Someone may have already paid for your order</div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal" id="checkoutModalInner">
+    <div class="modal-head">
+      <span class="modal-title" id="checkoutTitle">Checkout</span>
+      <button class="modal-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="modal-body" id="checkoutBody"></div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav id="mainNav">
+  <a href="index.html" class="nav-logo">Virtue <span>&</span> Vitality</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#categories">Collections</a></li>
+    <li><a href="#about">Mission</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="admin.html" style="color:var(--gold)">Admin ↗</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="nav-btn nav-btn-ghost" style="display:none" id="desktopAdminBtn" onclick="window.location='admin.html'">Admin</button>
+    <button class="nav-btn nav-btn-primary" onclick="openCart()" style="position:relative">
+      Cart
+      <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+    <button class="nav-toggle" id="navToggle" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <p class="hero-eyebrow">Faith · Fitness · Purpose</p>
+  <h1 class="hero-title">
+    Honor God with<br>Your <em>Body & Soul</em>
+  </h1>
+  <p class="hero-sub">
+    Faith-inspired activewear, devotionals, and wellness resources crafted for women who believe caring for their body is an act of worship.
+  </p>
+  <div class="hero-actions">
+    <button class="btn-xl btn-xl-white" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">Shop the Collection</button>
+    <button class="btn-xl btn-xl-outline" onclick="document.getElementById('pif-section').scrollIntoView({behavior:'smooth'})">🕊️ Pay it Forward</button>
+  </div>
+  <p class="hero-verse">"Do you not know that your bodies are temples of the Holy Spirit?" — 1 Corinthians 6:19</p>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-num">500<span>+</span></div>
+    <div class="stat-label">Community Members</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">4.9<span>★</span></div>
+    <div class="stat-label">Average Rating</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="pifCountStat">0</div>
+    <div class="stat-label">Gifts Given Forward</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">30<span>+</span></div>
+    <div class="stat-label">Products Available</div>
+  </div>
+</div>
+
+<!-- Trust Strip -->
+<div class="trust-strip">
+  <div class="trust-item"><span>🚚</span><span>Free shipping on orders over $75</span></div>
+  <div class="trust-item"><span>↩️</span><span>30-day returns</span></div>
+  <div class="trust-item"><span>🔒</span><span>Secure checkout</span></div>
+  <div class="trust-item"><span>📱</span><span>Instant digital delivery</span></div>
+  <div class="trust-item"><span>🕊️</span><span>Pay it Forward program</span></div>
+</div>
+
+<!-- Marquee -->
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- Products -->
+<section class="section products-section" id="shop">
+  <div class="products-header">
+    <div>
+      <p class="section-label reveal">Featured Products</p>
+      <h2 class="section-title reveal">Curated for <em>Your Journey</em></h2>
+      <div class="filter-row reveal" id="filterRow">
+        <button class="filter-chip active" onclick="filterProducts('all',this)">All</button>
+        <button class="filter-chip" onclick="filterProducts('apparel',this)">Apparel</button>
+        <button class="filter-chip" onclick="filterProducts('digital',this)">Digital</button>
+        <button class="filter-chip" onclick="filterProducts('devotional',this)">Devotionals</button>
+        <button class="filter-chip" onclick="filterProducts('accessories',this)">Accessories</button>
+      </div>
+    </div>
+  </div>
+  <div class="products-grid reveal" id="productsGrid"></div>
+</section>
+
+<!-- PIF Banner -->
+<div class="pif-banner" id="pif-section">
+  <div class="pif-icon">🕊️</div>
+  <h2 class="pif-title reveal">Pay it <em>Forward</em></h2>
+  <p class="pif-desc reveal">
+    Someone once chose to bless a stranger's purchase. Now you can too. Every act of generosity becomes a gift from God to someone you'll never meet.
+  </p>
+  <p class="pif-verse reveal">"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver." — 2 Cor. 9:7</p>
+  <button class="pif-learn-btn reveal" onclick="openCart()">Start Shopping →</button>
+</div>
+
+<!-- Callout / Temple Strong -->
+<div class="callout">
+  <div class="callout-inner">
+    <div>
+      <p class="section-label reveal">Digital Programs</p>
+      <h2 class="section-title reveal">Temple Strong<br><em>Training Series</em></h2>
+      <p class="section-desc reveal" style="margin-bottom:28px">
+        Our flagship 8-week faith-integrated fitness program. Build strength, endurance, and spiritual discipline — simultaneously. Instant digital download.
+      </p>
+      <button class="btn-xl btn-xl-white reveal" onclick="addToCartById('temple-strong')">Get the Program — $47.00</button>
+      <div class="callout-metrics reveal">
+        <div class="metric"><div class="metric-val">500+</div><div class="metric-label">Women enrolled</div></div>
+        <div class="metric"><div class="metric-val">8wk</div><div class="metric-label">Training program</div></div>
+        <div class="metric"><div class="metric-val">4.9★</div><div class="metric-label">Average rating</div></div>
+        <div class="metric"><div class="metric-val">∞</div><div class="metric-label">Instant access</div></div>
+      </div>
+    </div>
+    <div class="callout-visual reveal">
+      <div class="callout-visual-cross">
+        <svg viewBox="0 0 100 100" fill="white"><rect x="44" y="10" width="12" height="80"/><rect x="15" y="32" width="70" height="12"/></svg>
+      </div>
+      <div class="callout-visual-inner">💪</div>
+    </div>
+  </div>
+</div>
+
+<!-- Categories -->
+<section class="categories-section" id="categories">
+  <div class="categories-header">
+    <p class="section-label reveal">Browse By</p>
+    <h2 class="section-title reveal">Our <em>Collections</em></h2>
+  </div>
+  <div class="categories-grid" id="categoriesGrid">
+    <div class="cat-card reveal" onclick="filterProducts('apparel', null, true)">
+      <div class="cat-card-bg">👗</div>
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-card-label">Collection</div>
+        <div class="cat-card-name">Modest Activewear</div>
+        <div class="cat-card-count">14 products</div>
+        <div class="cat-card-arrow">Shop Now →</div>
+      </div>
+    </div>
+    <div class="cat-card reveal reveal-d1" onclick="filterProducts('devotional', null, true)">
+      <div class="cat-card-bg">📖</div>
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-card-label">Collection</div>
+        <div class="cat-card-name">Devotionals & Books</div>
+        <div class="cat-card-count">8 products</div>
+        <div class="cat-card-arrow">Explore →</div>
+      </div>
+    </div>
+    <div class="cat-card reveal reveal-d2" onclick="filterProducts('digital', null, true)">
+      <div class="cat-card-bg">💻</div>
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-card-label">Collection</div>
+        <div class="cat-card-name">Digital Programs</div>
+        <div class="cat-card-count">6 products</div>
+        <div class="cat-card-arrow">Download →</div>
+      </div>
+    </div>
+    <div class="cat-card reveal reveal-d3" onclick="filterProducts('accessories', null, true)">
+      <div class="cat-card-bg">🌿</div>
+      <div class="cat-card-overlay"></div>
+      <div class="cat-card-content">
+        <div class="cat-card-label">Collection</div>
+        <div class="cat-card-name">Wellness Accessories</div>
+        <div class="cat-card-count">10 products</div>
+        <div class="cat-card-arrow">Shop →</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section testimonials-section" id="community">
+  <p class="section-label reveal">Community Love</p>
+  <h2 class="section-title reveal">Women Transformed<br>by <em>Purpose</em></h2>
+  <div class="testimonials-grid">
+    <div class="testimonial reveal">
+      <div class="t-stars">★★★★★</div>
+      <div class="t-text">"The devotional changed how I approach my mornings. It's not just fitness — it's a whole spiritual reset every day. I've never felt so aligned."</div>
+      <div class="t-author"><div class="t-avatar">👩‍🦰</div><div><div class="t-name">Priscilla M.</div><div class="t-handle">Miami, FL · Temple Strong Member</div></div></div>
+    </div>
+    <div class="testimonial reveal reveal-d1">
+      <div class="t-stars">★★★★★</div>
+      <div class="t-text">"I finally found activewear that covers me properly AND looks beautiful. The Grace Flow leggings are my daily staple. Quality is exceptional."</div>
+      <div class="t-author"><div class="t-avatar">👩</div><div><div class="t-name">Jasmine O.</div><div class="t-handle">Atlanta, GA · Apparel Customer</div></div></div>
+    </div>
+    <div class="testimonial reveal reveal-d2">
+      <div class="t-stars">★★★★★</div>
+      <div class="t-text">"Someone paid for my first order through the Pay it Forward program. I cried. I had no idea generosity like this still existed. I paid it forward too."</div>
+      <div class="t-author"><div class="t-avatar">👩‍🦱</div><div><div class="t-name">Hannah R.</div><div class="t-handle">Dallas, TX · PIF Recipient & Giver</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="section newsletter">
+  <div class="newsletter-inner">
+    <p class="section-label reveal" style="justify-content:center">Stay Connected</p>
+    <h2 class="section-title reveal" style="text-align:center">Join the <em>Vitality Community</em></h2>
+    <p class="section-desc reveal" style="text-align:center;margin:0 auto 0">Weekly devotionals, wellness tips, early access, and 15% off your first order.</p>
+    <div class="newsletter-form reveal">
+      <input type="email" placeholder="Enter your email address">
+      <button class="btn-subscribe">Subscribe</button>
+    </div>
+    <p class="newsletter-note">🕊️ No spam, ever. You can unsubscribe anytime.</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer id="footer">
+  <div class="footer-top">
+    <div>
+      <a href="index.html" class="footer-logo">Virtue <span>&</span> Vitality</a>
+      <p class="footer-about">An e-commerce brand for Christian women who believe that physical health and spiritual growth are one sacred journey. South Florida, USA.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn">📸</a>
+        <a href="#" class="social-btn">🎵</a>
+        <a href="#" class="social-btn">📌</a>
+        <a href="#" class="social-btn">✉️</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Shop</div>
+      <ul class="footer-links">
+        <li><a href="#">Activewear</a></li>
+        <li><a href="#">Devotionals</a></li>
+        <li><a href="#">Digital Programs</a></li>
+        <li><a href="#">Accessories</a></li>
+        <li><a href="#">Gift Bundles</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a href="#">Our Mission</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Pay it Forward</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <ul class="footer-links">
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Shipping & Returns</a></li>
+        <li><a href="#">Size Guide</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="admin.html" style="color:var(--gold)">Admin Panel</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2026 Virtue & Vitality LLC — South Florida, USA</p>
+    <div class="footer-payments">
+      <span class="payment-chip">Stripe</span>
+      <span class="payment-chip">PayPal</span>
+      <span class="payment-chip">Visa</span>
+      <span class="payment-chip">MC</span>
+      <span class="payment-chip">Apple Pay</span>
+    </div>
+  </div>
+</footer>
+
+<!-- PWA Bottom Nav -->
+<nav class="pwa-nav" id="pwaNab">
+  <div class="pwa-nav-inner">
+    <button class="pwa-btn active" onclick="scrollToTop()">
+      <span class="pwa-btn-icon">🏠</span>
+      <span class="pwa-btn-label">Home</span>
+    </button>
+    <button class="pwa-btn" onclick="document.getElementById('shop').scrollIntoView({behavior:'smooth'})">
+      <span class="pwa-btn-icon">🛍️</span>
+      <span class="pwa-btn-label">Shop</span>
+    </button>
+    <button class="pwa-btn" onclick="document.getElementById('pif-section').scrollIntoView({behavior:'smooth'})">
+      <span class="pwa-btn-icon">🕊️</span>
+      <span class="pwa-btn-label">Forward</span>
+    </button>
+    <button class="pwa-btn" onclick="openCart()" style="position:relative">
+      <span class="pwa-btn-icon">🛒</span>
+      <span class="pwa-btn-label">Cart</span>
+      <span class="pwa-btn-cart-count" id="pwaBadge">0</span>
+    </button>
+    <button class="pwa-btn" onclick="window.location='admin.html'">
+      <span class="pwa-btn-icon">⚙️</span>
+      <span class="pwa-btn-label">Admin</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+/* ═══════════════════════════════════════════
+   STORE STATE
+═══════════════════════════════════════════ */
+const DEFAULT_PRODUCTS = [
+  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'🧘‍♀️', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25' },
+  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'📖', tag:'', verse:'Daily scripture, reflection, and wellness prompts.' },
+  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'💪', tag:'digital', verse:'Faith-integrated training combining strength and scripture.' },
+  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'✨', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10' },
+  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'📓', tag:'', verse:'Track habits, prayers, workouts, and scripture.' },
+  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'🎧', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.' },
+];
+
+function getProducts() {
+  try {
+    const s = localStorage.getItem('vv_products');
+    return s ? JSON.parse(s) : DEFAULT_PRODUCTS;
+  } catch { return DEFAULT_PRODUCTS; }
+}
+
+// PIF state via Artifact Storage + localStorage fallback
+async function getPifCredits() {
+  try {
+    const r = await window.storage.get('pif_credits');
+    return r ? parseFloat(r.value) : 0;
+  } catch {
+    return parseFloat(localStorage.getItem('vv_pif') || '0');
+  }
+}
+async function setPifCredits(val) {
+  try { await window.storage.set('pif_credits', String(val), true); } catch {}
+  localStorage.setItem('vv_pif', String(val));
+  updatePifStat();
+}
+async function addPifCredits(amt) {
+  const cur = await getPifCredits();
+  await setPifCredits(cur + amt);
+}
+async function usePifCredit() {
+  const cur = await getPifCredits();
+  if (cur <= 0) return false;
+  await setPifCredits(Math.max(0, cur - 1));
+  return true;
+}
+async function updatePifStat() {
+  try {
+    const r = await window.storage.get('pif_count');
+    const n = r ? parseInt(r.value) : parseInt(localStorage.getItem('vv_pif_count') || '0');
+    document.getElementById('pifCountStat').textContent = n;
+  } catch {
+    document.getElementById('pifCountStat').textContent = localStorage.getItem('vv_pif_count') || '0';
+  }
+}
+async function incrementPifCount() {
+  try {
+    const r = await window.storage.get('pif_count');
+    const n = (r ? parseInt(r.value) : 0) + 1;
+    await window.storage.set('pif_count', String(n), true);
+    localStorage.setItem('vv_pif_count', String(n));
+    updatePifStat();
+  } catch {
+    const n = parseInt(localStorage.getItem('vv_pif_count') || '0') + 1;
+    localStorage.setItem('vv_pif_count', String(n));
+    updatePifStat();
+  }
+}
+
+/* ─── CART ─── */
+let cart = [];
+function openCart() { document.getElementById('cartDrawer').classList.add('open'); document.getElementById('cartOverlay').classList.add('open'); renderCart(); }
+function closeCart() { document.getElementById('cartDrawer').classList.remove('open'); document.getElementById('cartOverlay').classList.remove('open'); }
+
+function addToCart(product) {
+  const existing = cart.find(i => i.id === product.id);
+  if (existing) existing.qty++;
+  else cart.push({ ...product, qty: 1 });
+  updateBadge(); renderCart();
+}
+function addToCartById(id) {
+  const p = getProducts().find(p => p.id === id);
+  if (p) { addToCart(p); openCart(); }
+}
+function changeQty(id, d) {
+  const i = cart.findIndex(c => c.id === id);
+  if (i < 0) return;
+  cart[i].qty += d;
+  if (cart[i].qty <= 0) cart.splice(i, 1);
+  updateBadge(); renderCart();
+}
+function cartTotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+function updateBadge() {
+  const n = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cartBadge').textContent = n;
+  document.getElementById('pwaBadge').textContent = n;
+}
+function renderCart() {
+  const body = document.getElementById('cartBody');
+  const foot = document.getElementById('cartFoot');
+  const empty = document.getElementById('cartEmpty');
+  document.getElementById('cartTotalVal').textContent = '$' + cartTotal().toFixed(2);
+  if (cart.length === 0) {
+    body.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">✦</div><div class="cart-empty-text">Your cart is empty</div><div style="font-size:0.78rem;color:var(--grey-3)">Fill it with purpose</div></div>`;
+    foot.style.display = 'none'; return;
+  }
+  foot.style.display = 'block';
+  body.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-thumb">${item.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-variant">${item.cat} · ${item.tag === 'digital' ? 'Instant Download' : 'Physical Product'}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-n">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',+1)">+</button>
+        </div>
+      </div>
+      <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+    </div>
+  `).join('');
+}
+
+/* ─── CHECKOUT FLOW ─── */
+let checkoutStep = 0; // 0=contact, 1=shipping, 2=payment, 3=pif/gift
+async function openCheckout() {
+  closeCart();
+  checkoutStep = 0;
+  // Check if there are PIF credits first
+  const credits = await getPifCredits();
+  if (credits > 0) {
+    // Show gift received screen
+    showGiftScreen();
+  } else {
+    showCheckoutStep(0);
+  }
+  document.getElementById('checkoutModal').classList.add('open');
+}
+function closeCheckout() {
+  document.getElementById('checkoutModal').classList.remove('open');
+}
+
+function stepLabels() {
+  return ['Contact','Shipping','Payment','Confirm'];
+}
+function stepsHtml(active) {
+  return `<div class="checkout-steps">${stepLabels().map((l,i)=>`<div class="checkout-step ${i===active?'active':i<active?'done':''}">${l}</div>`).join('')}</div>`;
+}
+
+function showCheckoutStep(step) {
+  checkoutStep = step;
+  document.getElementById('checkoutTitle').textContent = stepLabels()[step];
+  const b = document.getElementById('checkoutBody');
+  if (step === 0) {
+    b.innerHTML = `
+      ${stepsHtml(0)}
+      <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="f_name" placeholder="Your full name"></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" id="f_email" type="email" placeholder="your@email.com"></div>
+      <div class="form-group"><label class="form-label">Phone (optional)</label><input class="form-input" id="f_phone" placeholder="+1 (555) 000-0000"></div>
+      <button class="btn-confirm" onclick="showCheckoutStep(1)">Continue to Shipping →</button>`;
+  } else if (step === 1) {
+    b.innerHTML = `
+      ${stepsHtml(1)}
+      <div class="form-group"><label class="form-label">Address Line 1</label><input class="form-input" placeholder="123 Main Street"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="Miami"></div>
+        <div class="form-group"><label class="form-label">State</label><input class="form-input" placeholder="FL"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">ZIP Code</label><input class="form-input" placeholder="33101"></div>
+        <div class="form-group"><label class="form-label">Country</label><input class="form-input" value="United States"></div>
+      </div>
+      <button class="btn-confirm" onclick="showCheckoutStep(2)">Continue to Payment →</button>
+      <button class="btn-back" onclick="showCheckoutStep(0)">← Back</button>`;
+  } else if (step === 2) {
+    const total = cartTotal();
+    b.innerHTML = `
+      ${stepsHtml(2)}
+      <div class="order-summary">
+        ${cart.map(i=>`<div class="order-item"><span>${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('')}
+        <div class="order-total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+      </div>
+      <p class="form-section-title">Card Details</p>
+      <div class="form-group"><label class="form-label">Card Number</label><input class="form-input" placeholder="4242 4242 4242 4242" maxlength="19"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Expiry</label><input class="form-input" placeholder="MM / YY"></div>
+        <div class="form-group"><label class="form-label">CVC</label><input class="form-input" placeholder="123" maxlength="4"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Name on Card</label><input class="form-input" placeholder="Full name as on card"></div>
+      <button class="btn-confirm" onclick="showPifStep()">Confirm Order →</button>
+      <button class="btn-back" onclick="showCheckoutStep(1)">← Back</button>`;
+  }
+}
+
+function showPifStep() {
+  document.getElementById('checkoutTitle').textContent = 'Pay it Forward';
+  const credits = 0; // We already checked, came here organically
+  const b = document.getElementById('checkoutBody');
+  let selectedAmt = 10;
+  b.innerHTML = `
+    ${stepsHtml(3)}
+    <div style="text-align:center; padding: 12px 0 20px;">
+      <div style="font-size:2.8rem; margin-bottom:16px;">🕊️</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:10px;">Your order is confirmed!</div>
+      <div style="font-size:0.85rem;color:var(--grey-4);margin-bottom:24px;">Thank you for your purchase. One more thing...</div>
+    </div>
+    <div style="background:var(--black-3);border:1px solid rgba(122,158,126,0.25);padding:24px;margin-bottom:20px;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:8px;color:var(--white);">Would you like to <em style="color:var(--gold);font-style:italic;">Pay it Forward?</em></div>
+      <div style="font-size:0.82rem;color:var(--grey-4);line-height:1.7;margin-bottom:20px;">Leave a credit in our gift bank. The next person to checkout may receive your blessing — a surprise gift from God.</div>
+      <div class="pif-options" id="pifAmtOptions">
+        <button class="pif-opt active" data-amt="5" onclick="selectPifAmt(5,this)">$5</button>
+        <button class="pif-opt" data-amt="10" onclick="selectPifAmt(10,this)">$10</button>
+        <button class="pif-opt" data-amt="25" onclick="selectPifAmt(25,this)">$25</button>
+        <button class="pif-opt" data-amt="50" onclick="selectPifAmt(50,this)">$50</button>
+        <button class="pif-opt" data-amt="custom" onclick="selectPifAmt('custom',this)">Custom</button>
+      </div>
+      <div class="pif-custom-row" id="pifCustomRow" style="display:none;margin-top:10px;">
+        <input type="number" placeholder="Enter amount in $" id="pifCustomInput" min="1">
+      </div>
+    </div>
+    <p style="font-size:0.78rem;font-style:italic;color:var(--grey-3);text-align:center;margin-bottom:20px;">"Give, and it will be given to you... pressed down, shaken together and running over." — Luke 6:38</p>
+    <button class="btn-pif-yes" onclick="confirmPif()">Yes, I'll Pay it Forward 🕊️</button>
+    <button class="btn-pif-skip" onclick="completePurchase(false)">Skip for now</button>`;
+  
+  // set default selection
+  document.querySelector('.pif-opt[data-amt="5"]').classList.add('active');
+}
+
+function selectPifAmt(amt, btn) {
+  document.querySelectorAll('.pif-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const customRow = document.getElementById('pifCustomRow');
+  customRow.style.display = amt === 'custom' ? 'flex' : 'none';
+}
+
+async function confirmPif() {
+  const activeBtn = document.querySelector('.pif-opt.active');
+  let amt = parseFloat(activeBtn?.dataset.amt);
+  if (activeBtn?.dataset.amt === 'custom') {
+    amt = parseFloat(document.getElementById('pifCustomInput')?.value || 0);
+  }
+  if (!amt || amt <= 0) { amt = 5; }
+  await addPifCredits(amt);
+  await incrementPifCount();
+  completePurchase(true, amt);
+}
+
+function completePurchase(paidForward, amt) {
+  const b = document.getElementById('checkoutBody');
+  const msg = paidForward
+    ? `<div style="font-size:2rem;margin-bottom:8px;">🙏</div>
+       <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:10px;">God bless you!</div>
+       <div style="font-size:0.85rem;color:var(--grey-4);margin-bottom:20px;">You've left a <strong style="color:var(--gold)">$${amt}</strong> blessing for the next person. You may never know who you helped — but God does.</div>`
+    : `<div style="font-size:2rem;margin-bottom:8px;">✨</div>
+       <div style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:10px;">Order Confirmed!</div>
+       <div style="font-size:0.85rem;color:var(--grey-4);margin-bottom:20px;">Thank you for your purchase. A confirmation email is on its way.</div>`;
+  b.innerHTML = `
+    <div style="text-align:center;padding:32px 0;">
+      ${msg}
+      <div style="font-size:0.78rem;font-style:italic;color:var(--grey-3);margin-bottom:28px;">"Whatever you did for one of the least of these brothers and sisters of mine, you did for me." — Matt. 25:40</div>
+      <button class="btn-confirm" onclick="closeCheckout();cart=[];updateBadge();renderCart();">Close & Continue Shopping</button>
+    </div>`;
+  cart = []; updateBadge(); renderCart();
+}
+
+function showGiftScreen() {
+  document.getElementById('checkoutTitle').textContent = 'A Gift For You 🕊️';
+  const total = cartTotal();
+  document.getElementById('checkoutBody').innerHTML = `
+    <div class="gift-modal">
+      <div class="gift-sparkle">🎁</div>
+      <div class="gift-title">Someone <em>Already Paid</em> for You</div>
+      <div class="gift-desc">
+        A stranger chose to bless someone they'd never meet. Today, that someone is you.<br><br>
+        Your order of <strong style="color:var(--white)">$${total.toFixed(2)}</strong> has been covered by a gift left in our blessing bank. This is not a promotion — it's a real act of generosity from a fellow community member.
+      </div>
+      <div class="gift-verse">"Freely you have received; freely give." — Matthew 10:8</div>
+      <button class="btn-gift-forward" onclick="useCreditAndShowPif()">Accept the Gift & Pay it Forward 🕊️</button>
+      <button class="btn-gift-complete" onclick="useCreditAndComplete()">Accept the Gift — Complete Order</button>
+    </div>`;
+}
+
+async function useCreditAndShowPif() {
+  await usePifCredit();
+  showPifStep();
+}
+async function useCreditAndComplete() {
+  await usePifCredit();
+  completePurchase(false);
+}
+
+/* ─── PRODUCTS RENDER ─── */
+function renderProducts(filter) {
+  const products = getProducts();
+  const filtered = filter && filter !== 'all' ? products.filter(p => p.cat === filter) : products;
+  const grid = document.getElementById('productsGrid');
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="padding:40px;text-align:center;color:var(--grey-4);grid-column:1/-1">No products in this category yet.</div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card" data-cat="${p.cat}">
+      <div class="product-media" style="background:${p.bg||'var(--black-3)'}">
+        <div class="product-emoji">${p.emoji||'✦'}</div>
+        ${p.tag ? `<div class="product-tag tag-${p.tag}">${p.tag}</div>` : ''}
+        ${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.85">` : ''}
+        <button class="product-add-btn" onclick='addToCart(${JSON.stringify({id:p.id,name:p.name,cat:p.cat,price:p.price,emoji:p.emoji||"✦",tag:p.tag||""})});openCart()'>
+          Add to Cart +
+        </button>
+      </div>
+      <div class="product-body">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        ${p.verse ? `<div class="product-verse">${p.verse}</div>` : ''}
+        <div class="product-bottom">
+          <div class="product-price">
+            ${p.oldPrice ? `<span class="product-price-old">$${p.oldPrice}</span>` : ''}$${p.price}
+          </div>
+          <button class="product-wish" onclick="this.classList.toggle('active');this.textContent=this.classList.contains('active')?'♥':'♡'">♡</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterProducts(cat, btn, scroll) {
+  if (btn) {
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderProducts(cat);
+  if (scroll) document.getElementById('shop').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ─── MARQUEE ─── */
+function buildMarquee() {
+  const items = ['Faith-Inspired Activewear','Daily Devotionals','Workout Programs','Modest Fitness Apparel','Digital Wellness Resources','Christian Lifestyle','Spiritual Growth','Body as a Temple'];
+  const all = [...items, ...items];
+  document.getElementById('marqueeTrack').innerHTML = all.map(i => `<span class="marquee-item">${i}<span class="marquee-sep">✦</span></span>`).join('');
+}
+
+/* ─── SCROLL REVEAL ─── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ─── SCROLL TOP ─── */
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+/* ─── INIT ─── */
+window.addEventListener('DOMContentLoaded', async () => {
+  renderProducts('all');
+  buildMarquee();
+  await updatePifStat();
+});
+</script>
+</body>
+</html>

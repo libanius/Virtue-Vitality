@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>V&V Admin — Product Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #0a0a0a; --black-2: #111; --black-3: #1a1a1a; --black-4: #222;
+  --grey-1: #2a2a2a; --grey-2: #3a3a3a; --grey-3: #555; --grey-4: #888; --grey-5: #aaa;
+  --white: #fff; --off-white: #f5f5f5;
+  --gold: #c9a96e; --gold-2: #e8d5b0;
+  --sage: #7a9e7e; --red: #c0392b; --green: #27ae60;
+  --transition: 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{background:var(--black);color:var(--white);font-family:'Inter',sans-serif;font-weight:400;-webkit-font-smoothing:antialiased;min-height:100vh}
+button{cursor:pointer;font-family:inherit}
+a{text-decoration:none;color:inherit}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--black-2)}
+::-webkit-scrollbar-thumb{background:var(--grey-2);border-radius:2px}
+
+/* ─── LAYOUT ─── */
+.admin-layout{display:flex;min-height:100vh}
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--black-2);
+  border-right:1px solid rgba(255,255,255,0.07);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;bottom:0;z-index:10;
+  transition:left var(--transition);
+}
+.sidebar-logo{
+  padding:20px 20px 0;
+  font-family:'Playfair Display',serif;font-size:1rem;
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  padding-bottom:20px;margin-bottom:8px;
+}
+.sidebar-logo span{color:var(--gold)}
+.sidebar-back{
+  display:flex;align-items:center;gap:6px;
+  font-size:0.72rem;color:var(--grey-4);
+  padding:8px 20px;margin-bottom:16px;
+  transition:color var(--transition);
+}
+.sidebar-back:hover{color:var(--white)}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px;font-size:0.82rem;
+  color:var(--grey-4);transition:all var(--transition);
+  border-left:2px solid transparent;
+}
+.nav-item:hover{color:var(--white);background:rgba(255,255,255,0.03)}
+.nav-item.active{color:var(--white);border-left-color:var(--gold);background:rgba(201,169,110,0.05)}
+.nav-item-icon{font-size:1rem;width:20px;text-align:center}
+.nav-section-title{
+  font-size:0.62rem;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--grey-2);padding:16px 20px 6px;
+}
+.sidebar-bottom{margin-top:auto;padding:20px;border-top:1px solid rgba(255,255,255,0.07)}
+.pif-status{
+  background:rgba(122,158,126,0.08);border:1px solid rgba(122,158,126,0.2);
+  padding:12px;border-radius:2px;
+}
+.pif-status-label{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--sage);margin-bottom:4px}
+.pif-status-val{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--white)}
+.pif-status-sub{font-size:0.68rem;color:var(--grey-4);margin-top:2px}
+
+/* ─── MAIN ─── */
+.main{margin-left:240px;flex:1;min-height:100vh}
+.topbar{
+  height:56px;background:rgba(10,10,10,0.9);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;position:sticky;top:0;z-index:9;
+}
+.topbar-title{font-size:0.9rem;font-weight:500}
+.topbar-actions{display:flex;gap:8px}
+.btn-sm{
+  height:32px;padding:0 14px;font-size:0.75rem;
+  font-weight:500;letter-spacing:0.04em;border:none;
+  transition:all var(--transition);
+}
+.btn-sm-white{background:var(--white);color:var(--black)}
+.btn-sm-white:hover{background:var(--off-white)}
+.btn-sm-ghost{background:transparent;color:var(--grey-4);border:1px solid var(--grey-2)}
+.btn-sm-ghost:hover{color:var(--white);border-color:var(--grey-3)}
+.btn-sm-danger{background:var(--red);color:var(--white)}
+.btn-sm-danger:hover{background:#a93226}
+.btn-sm-success{background:var(--green);color:var(--white)}
+.btn-sm-success:hover{background:#229954}
+
+.content{padding:28px}
+
+/* ─── PAGE HEADER ─── */
+.page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:16px}
+.page-title{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:400}
+.page-sub{font-size:0.82rem;color:var(--grey-4);margin-top:4px}
+
+/* ─── STATS ROW ─── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.06);margin-bottom:28px}
+.stat-card{background:var(--black-2);padding:20px}
+.stat-card-val{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--white)}
+.stat-card-val span{color:var(--gold)}
+.stat-card-label{font-size:0.72rem;color:var(--grey-4);letter-spacing:0.08em;text-transform:uppercase;margin-top:4px}
+.stat-card-delta{font-size:0.72rem;color:var(--green);margin-top:6px}
+
+/* ─── PRODUCTS TABLE ─── */
+.table-section{background:var(--black-2);border:1px solid rgba(255,255,255,0.07);overflow:hidden}
+.table-head{
+  padding:16px 20px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,0.07);flex-wrap:wrap;gap:10px;
+}
+.table-head-title{font-size:0.85rem;font-weight:500}
+.search-bar{
+  display:flex;gap:8px;align-items:center;
+}
+.search-input{
+  height:32px;padding:0 12px;width:200px;
+  background:var(--black-3);border:1px solid var(--grey-2);
+  color:var(--white);font-family:inherit;font-size:0.8rem;
+  outline:none;transition:border-color var(--transition);
+}
+.search-input:focus{border-color:var(--grey-4)}
+.search-input::placeholder{color:var(--grey-3)}
+.product-table{width:100%;border-collapse:collapse}
+.product-table th{
+  padding:10px 20px;text-align:left;
+  font-size:0.68rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--grey-3);font-weight:500;
+  background:rgba(255,255,255,0.02);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.product-table td{
+  padding:14px 20px;font-size:0.82rem;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  vertical-align:middle;
+}
+.product-table tr:hover td{background:rgba(255,255,255,0.02)}
+.product-table tr:last-child td{border-bottom:none}
+.prod-thumb{
+  width:44px;height:54px;background:var(--black-3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;flex-shrink:0;overflow:hidden;
+}
+.prod-thumb img{width:100%;height:100%;object-fit:cover}
+.prod-row-info{display:flex;align-items:center;gap:12px}
+.prod-name{font-weight:400;line-height:1.3}
+.prod-id{font-size:0.68rem;color:var(--grey-4);margin-top:2px;font-family:monospace}
+.tag-pill{
+  display:inline-flex;align-items:center;
+  height:20px;padding:0 8px;
+  font-size:0.62rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:500;
+}
+.tag-new{background:rgba(255,255,255,0.1);color:var(--white)}
+.tag-sale{background:rgba(201,169,110,0.2);color:var(--gold)}
+.tag-digital{background:rgba(122,158,126,0.2);color:var(--sage)}
+.tag-{display:none}
+.row-actions{display:flex;gap:6px}
+
+/* ─── MODAL / DRAWER ─── */
+.drawer-overlay{
+  position:fixed;inset:0;z-index:199;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity var(--transition);
+}
+.drawer-overlay.open{opacity:1;pointer-events:all}
+.drawer{
+  position:fixed;top:0;right:-560px;width:560px;
+  max-width:100vw;height:100%;z-index:200;
+  background:var(--black-2);
+  border-left:1px solid rgba(255,255,255,0.1);
+  display:flex;flex-direction:column;
+  transition:right 0.4s cubic-bezier(0.4,0,0.2,1);
+  overflow:hidden;
+}
+.drawer.open{right:0}
+.drawer-head{
+  padding:20px 24px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;justify-content:space-between;align-items:center;
+  flex-shrink:0;
+}
+.drawer-title{font-family:'Playfair Display',serif;font-size:1.2rem}
+.drawer-close{
+  width:32px;height:32px;background:var(--black-3);
+  border:1px solid var(--grey-2);color:var(--grey-4);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+  transition:all var(--transition);
+}
+.drawer-close:hover{color:var(--white);background:var(--grey-1)}
+.drawer-body{flex:1;overflow-y:auto;padding:24px}
+.drawer-foot{
+  padding:16px 24px;border-top:1px solid rgba(255,255,255,0.08);
+  display:flex;gap:8px;flex-shrink:0;
+}
+
+/* ─── FORM ELEMENTS ─── */
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--grey-4);margin-bottom:6px}
+.form-input{
+  width:100%;height:40px;padding:0 12px;
+  background:var(--black-3);border:1px solid var(--grey-2);
+  color:var(--white);font-family:inherit;font-size:0.85rem;
+  outline:none;transition:border-color var(--transition);
+}
+.form-input:focus{border-color:var(--grey-4)}
+.form-input::placeholder{color:var(--grey-3)}
+.form-textarea{
+  width:100%;padding:10px 12px;min-height:80px;resize:vertical;
+  background:var(--black-3);border:1px solid var(--grey-2);
+  color:var(--white);font-family:inherit;font-size:0.85rem;
+  outline:none;transition:border-color var(--transition);
+}
+.form-textarea:focus{border-color:var(--grey-4)}
+.form-textarea::placeholder{color:var(--grey-3)}
+.form-select{
+  width:100%;height:40px;padding:0 12px;
+  background:var(--black-3);border:1px solid var(--grey-2);
+  color:var(--white);font-family:inherit;font-size:0.85rem;
+  outline:none;-webkit-appearance:none;
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-section{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin:20px 0 14px;display:flex;align-items:center;gap:8px}
+.form-section::before{content:'';flex:1;height:1px;background:rgba(201,169,110,0.2)}
+
+/* ─── MEDIA UPLOAD ─── */
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px}
+.media-thumb{
+  aspect-ratio:4/5;background:var(--black-3);
+  border:1px solid var(--grey-2);position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;gap:6px;cursor:pointer;
+  transition:border-color var(--transition);
+}
+.media-thumb:hover{border-color:var(--grey-4)}
+.media-thumb img,.media-thumb video{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+}
+.media-thumb-del{
+  position:absolute;top:4px;right:4px;
+  width:22px;height:22px;background:rgba(0,0,0,0.7);
+  border:none;color:var(--white);font-size:0.7rem;border-radius:50%;
+  display:none;align-items:center;justify-content:center;z-index:2;
+}
+.media-thumb:hover .media-thumb-del{display:flex}
+.media-thumb-add{
+  background:transparent;border:1px dashed var(--grey-2);
+  aspect-ratio:4/5;width:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;cursor:pointer;transition:all var(--transition);
+  color:var(--grey-3);font-size:0.75rem;
+}
+.media-thumb-add:hover{border-color:var(--grey-4);color:var(--white)}
+.media-thumb-add-icon{font-size:1.5rem}
+.media-hint{font-size:0.72rem;color:var(--grey-4)}
+
+/* ─── EMOJI PICKER ─── */
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.emoji-opt{
+  width:36px;height:36px;background:var(--black-3);
+  border:1px solid var(--grey-2);font-size:1.2rem;
+  transition:all var(--transition);display:flex;align-items:center;justify-content:center;
+}
+.emoji-opt:hover,.emoji-opt.selected{border-color:var(--gold);background:rgba(201,169,110,0.1)}
+
+/* ─── PIF MANAGER ─── */
+.pif-manager{background:var(--black-2);border:1px solid rgba(122,158,126,0.2);padding:24px;margin-bottom:28px}
+.pif-manager-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.pif-pool-display{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06)}
+.pif-pool-item{background:var(--black-3);padding:16px;text-align:center}
+.pif-pool-val{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--sage)}
+.pif-pool-lbl{font-size:0.68rem;color:var(--grey-4);margin-top:2px;letter-spacing:0.08em;text-transform:uppercase}
+.pif-log{max-height:200px;overflow-y:auto;margin-top:16px}
+.pif-log-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  font-size:0.8rem;
+}
+.pif-log-item:last-child{border-bottom:none}
+.pif-log-type{color:var(--sage)}
+.pif-log-type.used{color:var(--gold)}
+
+/* ─── TOGGLE ─── */
+.toggle{display:flex;align-items:center;gap:10px;font-size:0.82rem;color:var(--grey-4)}
+.toggle-sw{
+  width:36px;height:20px;background:var(--grey-2);border-radius:10px;
+  position:relative;cursor:pointer;transition:background var(--transition);
+  border:none;
+}
+.toggle-sw.on{background:var(--sage)}
+.toggle-sw::after{
+  content:'';position:absolute;top:2px;left:2px;
+  width:16px;height:16px;background:var(--white);border-radius:50%;
+  transition:left var(--transition);
+}
+.toggle-sw.on::after{left:18px}
+
+/* ─── NOTIFICATION ─── */
+.notif{
+  position:fixed;top:70px;right:20px;z-index:999;
+  background:var(--black-3);border:1px solid var(--grey-2);
+  padding:12px 16px;font-size:0.82rem;
+  display:flex;align-items:center;gap:8px;
+  transform:translateX(120%);transition:transform 0.3s ease;
+  max-width:300px;
+}
+.notif.show{transform:translateX(0)}
+.notif.success{border-color:rgba(39,174,96,0.4);background:rgba(39,174,96,0.05)}
+.notif.error{border-color:rgba(192,57,43,0.4);background:rgba(192,57,43,0.05)}
+
+/* ─── DELETE CONFIRM ─── */
+.confirm-modal{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+}
+.confirm-modal.open{display:flex}
+.confirm-box{
+  background:var(--black-2);border:1px solid rgba(255,255,255,0.1);
+  padding:28px;max-width:380px;text-align:center;
+}
+.confirm-title{font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:10px}
+.confirm-desc{font-size:0.85rem;color:var(--grey-4);margin-bottom:24px;line-height:1.6}
+.confirm-actions{display:flex;gap:8px;justify-content:center}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .sidebar{left:-240px}.sidebar.mobile-open{left:0}
+  .main{margin-left:0}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .drawer{width:100vw}
+  .form-row{grid-template-columns:1fr}
+  .pif-pool-display{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="notif" id="notif"></div>
+
+<!-- Delete Confirm Modal -->
+<div class="confirm-modal" id="confirmModal">
+  <div class="confirm-box">
+    <div class="confirm-title">Delete Product?</div>
+    <div class="confirm-desc">This action cannot be undone. The product will be permanently removed from the store.</div>
+    <div class="confirm-actions">
+      <button class="btn-sm btn-sm-danger" id="confirmYes">Delete</button>
+      <button class="btn-sm btn-sm-ghost" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Drawer Overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- Product Drawer -->
+<div class="drawer" id="productDrawer">
+  <div class="drawer-head">
+    <span class="drawer-title" id="drawerTitle">Add Product</span>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot">
+    <button class="btn-sm btn-sm-white" id="drawerSave" onclick="saveProduct()">Save Product</button>
+    <button class="btn-sm btn-sm-ghost" onclick="closeDrawer()">Cancel</button>
+  </div>
+</div>
+
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">Virtue <span>&</span> Vitality<br><span style="font-family:'Inter',sans-serif;font-size:0.68rem;color:var(--grey-4);font-weight:300">Admin Panel</span></div>
+    <a href="index.html" class="sidebar-back">← Back to Store</a>
+    <div class="nav-section-title">Management</div>
+    <a href="#" class="nav-item active" onclick="showSection('products',this)"><span class="nav-item-icon">📦</span>Products</a>
+    <a href="#" class="nav-item" onclick="showSection('pif',this)"><span class="nav-item-icon">🕊️</span>Pay it Forward</a>
+    <a href="#" class="nav-item" onclick="showSection('settings',this)"><span class="nav-item-icon">⚙️</span>Settings</a>
+    <div class="sidebar-bottom">
+      <div class="pif-status">
+        <div class="pif-status-label">PIF Credits</div>
+        <div class="pif-status-val" id="sidebarPifVal">$0</div>
+        <div class="pif-status-sub" id="sidebarPifCount">0 gifts given</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Products</div>
+      <div class="topbar-actions">
+        <a href="index.html" class="btn-sm btn-sm-ghost">View Store ↗</a>
+        <button class="btn-sm btn-sm-white" id="topbarAddBtn" onclick="openAddProduct()">+ Add Product</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- PRODUCTS SECTION -->
+      <div id="section-products">
+        <div class="page-header">
+          <div><div class="page-title">Products</div><div class="page-sub">Manage your store catalog — add, edit, and organize products</div></div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-card-val" id="totalProducts">0</div><div class="stat-card-label">Total Products</div></div>
+          <div class="stat-card"><div class="stat-card-val"><span id="totalActive">0</span></div><div class="stat-card-label">Active</div></div>
+          <div class="stat-card"><div class="stat-card-val" id="totalCategories">0</div><div class="stat-card-label">Categories</div></div>
+          <div class="stat-card"><div class="stat-card-val">$<span id="avgPrice">0</span></div><div class="stat-card-label">Avg. Price</div></div>
+        </div>
+        <div class="table-section">
+          <div class="table-head">
+            <div class="table-head-title">All Products</div>
+            <div class="search-bar">
+              <input class="search-input" id="searchInput" placeholder="Search products..." oninput="renderTable()">
+              <select class="search-input" id="catFilter" onchange="renderTable()" style="width:130px">
+                <option value="">All Categories</option>
+                <option value="apparel">Apparel</option>
+                <option value="digital">Digital</option>
+                <option value="devotional">Devotional</option>
+                <option value="accessories">Accessories</option>
+              </select>
+            </div>
+          </div>
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th style="width:40%">Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Tag</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PIF SECTION -->
+      <div id="section-pif" style="display:none">
+        <div class="page-header">
+          <div><div class="page-title">Pay it Forward</div><div class="page-sub">Manage the blessing bank — monitor credits, gifts, and activity</div></div>
+        </div>
+        <div class="pif-manager">
+          <div class="pif-manager-head">
+            <div style="font-family:'Playfair Display',serif;font-size:1.1rem;">Blessing Bank</div>
+            <div style="display:flex;gap:8px">
+              <button class="btn-sm btn-sm-success" onclick="openAddCredit()">+ Add Credit</button>
+              <button class="btn-sm btn-sm-danger" onclick="resetPifCredits()">Reset Credits</button>
+            </div>
+          </div>
+          <div class="pif-pool-display">
+            <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalCredits">$0</div><div class="pif-pool-lbl">Available</div></div>
+            <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalGiven">0</div><div class="pif-pool-lbl">Gifts Given</div></div>
+            <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalUsed">0</div><div class="pif-pool-lbl">Times Used</div></div>
+          </div>
+          <div id="pifLogSection"></div>
+        </div>
+        <div class="table-section" style="padding:20px">
+          <div style="font-size:0.85rem;font-weight:500;margin-bottom:16px">How it Works</div>
+          <div style="font-size:0.82rem;color:var(--grey-4);line-height:1.9">
+            <p>1. After completing their order, customers are asked if they'd like to Pay it Forward by leaving a credit.</p>
+            <p>2. The credit is added to the blessing bank (shared storage, visible to all).</p>
+            <p>3. The next customer to reach checkout will see a message that a stranger has paid for their order.</p>
+            <p>4. One credit is used per checkout. If the credit runs out, normal checkout continues.</p>
+            <p>5. The recipient is then also invited to Pay it Forward — creating a chain of generosity.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS SECTION -->
+      <div id="section-settings" style="display:none">
+        <div class="page-header">
+          <div><div class="page-title">Settings</div><div class="page-sub">Configure your store preferences</div></div>
+        </div>
+        <div class="table-section" style="padding:24px">
+          <div style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:20px">Store Settings</div>
+          <div class="form-group"><label class="form-label">Store Name</label><input class="form-input" value="Virtue & Vitality"></div>
+          <div class="form-group"><label class="form-label">Store Tagline</label><input class="form-input" value="Faith · Fitness · Purpose"></div>
+          <div class="form-group"><label class="form-label">Contact Email</label><input class="form-input" type="email" placeholder="hello@virtueandvitality.com"></div>
+          <div style="margin-bottom:16px;padding:16px;background:var(--black-3);border:1px solid rgba(255,255,255,0.06)">
+            <div class="toggle"><button class="toggle-sw on" id="togglePif" onclick="this.classList.toggle('on')"></button>Pay it Forward feature enabled</div>
+          </div>
+          <div style="margin-bottom:16px;padding:16px;background:var(--black-3);border:1px solid rgba(255,255,255,0.06)">
+            <div class="toggle"><button class="toggle-sw on" id="toggleReviews" onclick="this.classList.toggle('on')"></button>Show customer reviews</div>
+          </div>
+          <button class="btn-sm btn-sm-white" onclick="notify('Settings saved!','success')">Save Settings</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Add Credit Modal -->
+<div id="addCreditModal" style="position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;">
+  <div style="background:var(--black-2);border:1px solid rgba(255,255,255,0.1);padding:28px;max-width:360px;width:100%;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:16px">Add PIF Credit</div>
+    <div class="form-group"><label class="form-label">Amount ($)</label><input class="form-input" type="number" id="addCreditAmt" min="1" placeholder="e.g. 25"></div>
+    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="addCreditNote" placeholder="e.g. Manual test credit"></div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="btn-sm btn-sm-white" onclick="confirmAddCredit()">Add Credit</button>
+      <button class="btn-sm btn-sm-ghost" onclick="document.getElementById('addCreditModal').style.display='none'">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   ADMIN STATE
+═══════════════════════════════════════════ */
+const DEFAULT_PRODUCTS = [
+  { id:'grace-leggings', name:'Grace Flow Leggings', cat:'apparel', price:68, emoji:'🧘‍♀️', tag:'new', verse:'"Strength and dignity are her clothing" — Prov. 31:25', active:true },
+  { id:'renew-devotional', name:'Renew & Rise: 30-Day Devotional', cat:'devotional', price:24, emoji:'📖', tag:'', verse:'Daily scripture, reflection, and wellness prompts.', active:true },
+  { id:'temple-strong', name:'Temple Strong 8-Week Program', cat:'digital', price:47, emoji:'💪', tag:'digital', verse:'Faith-integrated training combining strength and scripture.', active:true },
+  { id:'stillwater-bra', name:'Stillwater Modest Sports Bra', cat:'apparel', price:38, oldPrice:52, emoji:'✨', tag:'sale', verse:'"Be still and know that I am God" — Psalm 46:10', active:true },
+  { id:'wellness-planner', name:'Virtue Wellness Planner', cat:'accessories', price:32, emoji:'📓', tag:'', verse:'Track habits, prayers, workouts, and scripture.', active:true },
+  { id:'soul-sweat', name:'Soul & Sweat Digital Bundle', cat:'digital', price:79, oldPrice:98, emoji:'🎧', tag:'digital', verse:'Complete digital library: devotional + training + nutrition.', active:true },
+];
+
+function getProducts() {
+  try { const s = localStorage.getItem('vv_products'); return s ? JSON.parse(s) : DEFAULT_PRODUCTS; } catch { return DEFAULT_PRODUCTS; }
+}
+function saveProducts(prods) {
+  localStorage.setItem('vv_products', JSON.stringify(prods));
+  updateStats();
+  renderTable();
+}
+
+// PIF
+async function getPifCredits() {
+  try { const r = await window.storage.get('pif_credits'); return r ? parseFloat(r.value) : parseFloat(localStorage.getItem('vv_pif')||'0'); } catch { return parseFloat(localStorage.getItem('vv_pif')||'0'); }
+}
+async function getPifCount() {
+  try { const r = await window.storage.get('pif_count'); return r ? parseInt(r.value) : parseInt(localStorage.getItem('vv_pif_count')||'0'); } catch { return parseInt(localStorage.getItem('vv_pif_count')||'0'); }
+}
+async function getPifUsed() { return parseInt(localStorage.getItem('vv_pif_used')||'0'); }
+async function setPifCredits(v) {
+  try { await window.storage.set('pif_credits', String(v), true); } catch {}
+  localStorage.setItem('vv_pif', String(v));
+  await updatePifDisplay();
+}
+async function updatePifDisplay() {
+  const credits = await getPifCredits();
+  const count = await getPifCount();
+  const used = await getPifUsed();
+  document.getElementById('pifTotalCredits').textContent = '$'+credits.toFixed(2);
+  document.getElementById('pifTotalGiven').textContent = count;
+  document.getElementById('pifTotalUsed').textContent = used;
+  document.getElementById('sidebarPifVal').textContent = '$'+credits.toFixed(2);
+  document.getElementById('sidebarPifCount').textContent = count+' gifts given';
+}
+
+let pifLog = [];
+function updatePifLog() {
+  const el = document.getElementById('pifLogSection');
+  if (!pifLog.length) { el.innerHTML = '<div style="font-size:0.78rem;color:var(--grey-4);margin-top:16px;font-style:italic;">No activity yet.</div>'; return; }
+  el.innerHTML = `<div style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--grey-3);margin-top:16px;margin-bottom:8px">Recent Activity</div>
+    <div class="pif-log">${pifLog.slice().reverse().map(l=>`
+      <div class="pif-log-item">
+        <span class="pif-log-type ${l.type==='used'?'used':''}">${l.type==='add'?'+ Credit Added':'↳ Gift Used'}</span>
+        <span style="color:var(--white)">$${l.amount.toFixed(2)}</span>
+        <span style="color:var(--grey-4)">${l.note||''}</span>
+        <span style="color:var(--grey-3)">${l.time}</span>
+      </div>`).join('')}
+    </div>`;
+}
+
+/* ─── EDITING STATE ─── */
+let editingId = null;
+let editingMediaFiles = [];
+let editingEmoji = '✦';
+
+const EMOJI_OPTIONS = ['🧘‍♀️','📖','💪','✨','📓','🎧','🙏','🌿','💛','🕊️','✝️','🌸','💎','🏃‍♀️','👗','🎁','📿','🌟'];
+
+function openAddProduct() {
+  editingId = null;
+  editingMediaFiles = [];
+  editingEmoji = '✦';
+  document.getElementById('drawerTitle').textContent = 'Add Product';
+  renderDrawerForm(null);
+  document.getElementById('productDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function openEditProduct(id) {
+  const products = getProducts();
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  editingEmoji = p.emoji || '✦';
+  editingMediaFiles = p.mediaUrls ? [...p.mediaUrls] : [];
+  document.getElementById('drawerTitle').textContent = 'Edit Product';
+  renderDrawerForm(p);
+  document.getElementById('productDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('productDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+function renderDrawerForm(p) {
+  const b = document.getElementById('drawerBody');
+  b.innerHTML = `
+    <div class="form-group">
+      <label class="form-label">Product Name *</label>
+      <input class="form-input" id="f_name" placeholder="e.g. Grace Flow Leggings" value="${p?.name||''}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Category *</label>
+        <select class="form-select" id="f_cat">
+          <option value="apparel" ${p?.cat==='apparel'?'selected':''}>Apparel</option>
+          <option value="digital" ${p?.cat==='digital'?'selected':''}>Digital</option>
+          <option value="devotional" ${p?.cat==='devotional'?'selected':''}>Devotional</option>
+          <option value="accessories" ${p?.cat==='accessories'?'selected':''}>Accessories</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tag</label>
+        <select class="form-select" id="f_tag">
+          <option value="" ${!p?.tag?'selected':''}>None</option>
+          <option value="new" ${p?.tag==='new'?'selected':''}>New</option>
+          <option value="sale" ${p?.tag==='sale'?'selected':''}>Sale</option>
+          <option value="digital" ${p?.tag==='digital'?'selected':''}>Digital</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Price ($) *</label>
+        <input class="form-input" type="number" id="f_price" min="0" step="0.01" value="${p?.price||''}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Old Price ($)</label>
+        <input class="form-input" type="number" id="f_oldprice" min="0" step="0.01" value="${p?.oldPrice||''}" placeholder="Optional">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description / Verse</label>
+      <textarea class="form-textarea" id="f_verse" placeholder="Short description or Bible verse...">${p?.verse||''}</textarea>
+    </div>
+
+    <div class="form-section">Emoji Icon</div>
+    <div style="margin-bottom:10px;font-size:0.78rem;color:var(--grey-4)">Selected: <span id="emojiPreview" style="font-size:1.4rem">${editingEmoji}</span></div>
+    <div class="emoji-grid" id="emojiGrid">
+      ${EMOJI_OPTIONS.map(e=>`<button class="emoji-opt ${e===editingEmoji?'selected':''}" onclick="selectEmoji('${e}',this)">${e}</button>`).join('')}
+    </div>
+    <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+      <input class="form-input" id="customEmoji" placeholder="Or type emoji..." style="width:120px" oninput="if(this.value){selectEmoji(this.value,null)}">
+    </div>
+
+    <div class="form-section">Photos & Videos</div>
+    <div class="media-grid" id="mediaGrid"></div>
+    <label class="media-thumb-add" style="margin-top:0" onclick="document.getElementById('mediaUpload').click()">
+      <div class="media-thumb-add-icon">+</div>
+      <div>Add Photo or Video</div>
+    </label>
+    <input type="file" id="mediaUpload" accept="image/*,video/*" multiple style="display:none" onchange="handleMediaUpload(event)">
+    <div class="media-hint" style="margin-top:6px">Supported: JPG, PNG, GIF, MP4. Max 10MB each.</div>
+  `;
+  renderMediaGrid();
+}
+
+function selectEmoji(e, btn) {
+  editingEmoji = e;
+  document.getElementById('emojiPreview').textContent = e;
+  document.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+}
+
+function handleMediaUpload(event) {
+  const files = Array.from(event.target.files);
+  files.forEach(file => {
+    if (file.size > 10 * 1024 * 1024) { notify('File too large: ' + file.name, 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      editingMediaFiles.push({ url: e.target.result, type: file.type.startsWith('video') ? 'video' : 'image', name: file.name });
+      renderMediaGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+  event.target.value = '';
+}
+function removeMedia(idx) {
+  editingMediaFiles.splice(idx, 1);
+  renderMediaGrid();
+}
+function renderMediaGrid() {
+  const grid = document.getElementById('mediaGrid');
+  if (!grid) return;
+  grid.innerHTML = editingMediaFiles.map((m, i) => `
+    <div class="media-thumb">
+      ${m.type === 'video'
+        ? `<video src="${m.url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video>`
+        : `<img src="${m.url}" alt="${m.name}">`}
+      <button class="media-thumb-del" onclick="removeMedia(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function saveProduct() {
+  const name = document.getElementById('f_name')?.value?.trim();
+  const cat = document.getElementById('f_cat')?.value;
+  const price = parseFloat(document.getElementById('f_price')?.value);
+  const oldPrice = parseFloat(document.getElementById('f_oldprice')?.value) || null;
+  const tag = document.getElementById('f_tag')?.value || '';
+  const verse = document.getElementById('f_verse')?.value?.trim() || '';
+  if (!name) { notify('Product name is required', 'error'); return; }
+  if (!price || price <= 0) { notify('Valid price is required', 'error'); return; }
+  const products = getProducts();
+  const product = {
+    id: editingId || 'p_' + Date.now(),
+    name, cat, price, oldPrice, tag, verse,
+    emoji: editingEmoji,
+    mediaUrls: editingMediaFiles.map(m => m.url),
+    mediaUrl: editingMediaFiles[0]?.url || null,
+    active: true,
+  };
+  if (editingId) {
+    const idx = products.findIndex(p => p.id === editingId);
+    if (idx >= 0) products[idx] = product;
+    notify('Product updated!', 'success');
+  } else {
+    products.push(product);
+    notify('Product added!', 'success');
+  }
+  saveProducts(products);
+  closeDrawer();
+}
+
+/* ─── TABLE ─── */
+function renderTable() {
+  const products = getProducts();
+  const q = document.getElementById('searchInput')?.value?.toLowerCase() || '';
+  const cat = document.getElementById('catFilter')?.value || '';
+  const filtered = products.filter(p =>
+    (!q || p.name.toLowerCase().includes(q)) &&
+    (!cat || p.cat === cat)
+  );
+  const tbody = document.getElementById('productTableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--grey-4);font-style:italic">No products found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(p => `
+    <tr>
+      <td>
+        <div class="prod-row-info">
+          <div class="prod-thumb">${p.mediaUrl ? `<img src="${p.mediaUrl}" alt="${p.name}">` : p.emoji||'✦'}</div>
+          <div><div class="prod-name">${p.name}</div><div class="prod-id">${p.id}</div></div>
+        </div>
+      </td>
+      <td style="color:var(--grey-4);text-transform:capitalize">${p.cat}</td>
+      <td>$${p.price}${p.oldPrice ? `<span style="color:var(--grey-3);text-decoration:line-through;font-size:0.78rem;margin-left:6px">$${p.oldPrice}</span>` : ''}</td>
+      <td><span class="tag-pill tag-${p.tag}">${p.tag||'—'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="btn-sm btn-sm-ghost" onclick="openEditProduct('${p.id}')">Edit</button>
+          <button class="btn-sm btn-sm-danger" onclick="confirmDelete('${p.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+let deleteTargetId = null;
+function confirmDelete(id) {
+  deleteTargetId = id;
+  document.getElementById('confirmModal').classList.add('open');
+  document.getElementById('confirmYes').onclick = () => {
+    const products = getProducts().filter(p => p.id !== deleteTargetId);
+    saveProducts(products);
+    document.getElementById('confirmModal').classList.remove('open');
+    notify('Product deleted', 'success');
+  };
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('open'); }
+
+/* ─── STATS ─── */
+function updateStats() {
+  const products = getProducts();
+  document.getElementById('totalProducts').textContent = products.length;
+  document.getElementById('totalActive').textContent = products.filter(p => p.active).length;
+  document.getElementById('totalCategories').textContent = new Set(products.map(p => p.cat)).size;
+  const avg = products.length ? (products.reduce((s, p) => s + p.price, 0) / products.length).toFixed(0) : 0;
+  document.getElementById('avgPrice').textContent = avg;
+}
+
+/* ─── SECTION SWITCHING ─── */
+function showSection(name, navEl) {
+  ['products','pif','settings'].forEach(s => {
+    document.getElementById('section-'+s).style.display = s === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('topbarTitle').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('topbarAddBtn').style.display = name === 'products' ? '' : 'none';
+  if (name === 'pif') updatePifDisplay();
+}
+
+/* ─── PIF CREDIT MANAGEMENT ─── */
+function openAddCredit() { document.getElementById('addCreditModal').style.display = 'flex'; }
+async function confirmAddCredit() {
+  const amt = parseFloat(document.getElementById('addCreditAmt').value);
+  const note = document.getElementById('addCreditNote').value || 'Manual admin credit';
+  if (!amt || amt <= 0) { notify('Enter a valid amount', 'error'); return; }
+  const cur = await getPifCredits();
+  await setPifCredits(cur + amt);
+  pifLog.push({ type: 'add', amount: amt, note, time: new Date().toLocaleTimeString() });
+  updatePifLog();
+  document.getElementById('addCreditModal').style.display = 'none';
+  notify(`$${amt} credit added to blessing bank!`, 'success');
+}
+async function resetPifCredits() {
+  if (!confirm('Reset all PIF credits to $0? This cannot be undone.')) return;
+  await setPifCredits(0);
+  pifLog.push({ type: 'reset', amount: 0, note: 'Admin reset', time: new Date().toLocaleTimeString() });
+  updatePifLog();
+  notify('PIF credits reset to $0', 'success');
+}
+
+/* ─── NOTIFY ─── */
+function notify(msg, type='success') {
+  const n = document.getElementById('notif');
+  n.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+  n.className = 'notif ' + type + ' show';
+  setTimeout(() => n.classList.remove('show'), 3000);
+}
+
+/* ─── INIT ─── */
+window.addEventListener('DOMContentLoaded', async () => {
+  renderTable();
+  updateStats();
+  await updatePifDisplay();
+  updatePifLog();
+});
+</script>
+</body>
+</html>
