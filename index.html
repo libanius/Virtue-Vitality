@@ -117,17 +117,6 @@ nav.scrolled {
   color: var(--white); font-weight: 400;
 }
 .nav-logo span { color: var(--gold); }
-.nav-links {
-  display: flex; gap: 0; list-style: none;
-}
-.nav-links a {
-  display: block; padding: 0 16px; height: var(--nav-h);
-  line-height: var(--nav-h);
-  font-size: 0.8rem; font-weight: 400; letter-spacing: 0.02em;
-  color: var(--grey-5); transition: color var(--transition);
-  white-space: nowrap;
-}
-.nav-links a:hover { color: var(--white); }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
 .nav-btn {
   height: 36px; padding: 0 18px;
@@ -135,11 +124,6 @@ nav.scrolled {
   border: none; transition: all var(--transition);
   white-space: nowrap;
 }
-.nav-btn-ghost {
-  background: transparent; color: var(--grey-5);
-  border: 1px solid var(--grey-2);
-}
-.nav-btn-ghost:hover { border-color: var(--grey-4); color: var(--white); }
 .nav-btn-primary {
   background: var(--white); color: var(--black);
   position: relative; overflow: hidden;
@@ -151,10 +135,6 @@ nav.scrolled {
   width: 16px; height: 16px; border-radius: 50%;
   font-size: 0.6rem; font-weight: 600;
   display: flex; align-items: center; justify-content: center;
-}
-.nav-toggle {
-  display: none; background: none; border: none;
-  color: var(--white); font-size: 1.4rem; padding: 4px;
 }
 
 /* ─── HERO ─── */
@@ -673,11 +653,28 @@ footer,
 footer {
   background: var(--black-2);
   border-top: 1px solid rgba(255,255,255,0.06);
-  padding: 64px 32px 0;
+  padding: 0 32px;
 }
+.footer-nav {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; flex-wrap: wrap;
+  padding: 28px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.footer-nav-link {
+  padding: 10px 20px;
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--grey-5); font-weight: 400;
+  transition: color var(--transition), background var(--transition);
+  border-radius: 2px;
+}
+.footer-nav-link:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+.footer-nav-admin { color: var(--gold); }
+.footer-nav-admin:hover { color: var(--gold-2); }
 .footer-top {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px; margin-bottom: 48px;
+  padding-top: 56px;
 }
 .footer-logo {
   font-family: 'Playfair Display', serif;
@@ -1163,15 +1160,7 @@ footer {
   .callout-visual { max-width: 400px; }
 }
 @media (max-width: 768px) {
-  .nav-links { display: none; }
-  .nav-toggle { display: flex; }
-  .nav-links.open {
-    display: flex; flex-direction: column;
-    position: fixed; top: var(--nav-h); left: 0; right: 0;
-    background: var(--black-2); padding: 16px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 99;
-  }
-  .nav-links.open a { height: 44px; line-height: 44px; }
+  .footer-nav { display: none; }
   .hero { min-height: 65vh; padding: calc(var(--nav-h) + 28px) 20px 44px; }
   .hero-verse { margin-top: 28px; font-size: 0.75rem; }
   .hero-peek { bottom: 10px; }
@@ -1321,20 +1310,11 @@ footer {
 <!-- Navigation -->
 <nav id="mainNav">
   <a href="index.html" class="nav-logo">Virtue <span>&</span> Vitality</a>
-  <ul class="nav-links" id="navLinks">
-    <li><a href="#shop" onclick="document.getElementById('navLinks').classList.remove('open')">Shop</a></li>
-    <li><a href="#categories" onclick="document.getElementById('navLinks').classList.remove('open')">Collections</a></li>
-    <li><a href="#about" onclick="document.getElementById('navLinks').classList.remove('open')">Mission</a></li>
-    <li><a href="#community" onclick="document.getElementById('navLinks').classList.remove('open')">Community</a></li>
-    <li><a href="admin.html" style="color:var(--gold)">Admin ↗</a></li>
-  </ul>
   <div class="nav-actions">
-    <button class="nav-btn nav-btn-ghost" style="display:none" id="desktopAdminBtn" onclick="window.location='admin.html'">Admin</button>
     <button class="nav-btn nav-btn-primary" onclick="openCart()" style="position:relative" aria-label="Open cart">
       Cart
       <span class="cart-badge" id="cartBadge" aria-live="polite">0</span>
     </button>
-    <button class="nav-toggle" id="navToggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
   </div>
 </nav>
 
@@ -1542,6 +1522,13 @@ footer {
 
 <!-- Footer -->
 <footer id="footer">
+  <nav class="footer-nav" aria-label="Main navigation">
+    <a href="#shop" class="footer-nav-link">Shop</a>
+    <a href="#categories" class="footer-nav-link">Collections</a>
+    <a href="#pif-section" class="footer-nav-link">Pay it Forward</a>
+    <a href="#community" class="footer-nav-link">Community</a>
+    <a href="admin.html" class="footer-nav-link footer-nav-admin">Admin ↗</a>
+  </nav>
   <div class="footer-top">
     <div>
       <a href="index.html" class="footer-logo">Virtue <span>&</span> Vitality</a>
