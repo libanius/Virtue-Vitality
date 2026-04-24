@@ -159,12 +159,30 @@ nav.scrolled {
 
 /* ─── HERO ─── */
 .hero {
-  min-height: 100vh;
+  min-height: 78vh;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   position: relative; overflow: hidden;
-  padding: calc(var(--nav-h) + 60px) 32px 80px;
+  padding: calc(var(--nav-h) + 40px) 32px 56px;
   text-align: center;
+}
+.hero-peek {
+  position: absolute;
+  bottom: 16px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--grey-4);
+  opacity: 0; animation: fadeUp 0.8s 1s forwards;
+}
+.hero-peek-arrow {
+  width: 1px; height: 28px;
+  background: linear-gradient(to bottom, transparent, var(--gold));
+  animation: peekPulse 2.4s ease-in-out infinite;
+}
+@keyframes peekPulse {
+  0%, 100% { opacity: 0.4; transform: scaleY(0.7); transform-origin: top; }
+  50% { opacity: 1; transform: scaleY(1); }
 }
 .hero-bg {
   position: absolute; inset: 0;
@@ -233,7 +251,7 @@ nav.scrolled {
 .btn-xl-gold:hover { background: var(--gold-2); transform: translateY(-2px); box-shadow: 0 4px 32px rgba(201,169,110,0.4); }
 .btn-xl-gold:active { transform: translateY(0); }
 .hero-verse {
-  margin-top: 64px; font-size: 0.82rem; color: var(--grey-4);
+  margin-top: 40px; font-size: 0.82rem; color: var(--grey-4);
   font-style: italic; letter-spacing: 0.02em;
   opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
 }
@@ -1110,13 +1128,17 @@ footer {
     border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 99;
   }
   .nav-links.open a { height: 44px; line-height: 44px; }
+  .hero { min-height: 65vh; padding: calc(var(--nav-h) + 28px) 20px 44px; }
+  .hero-verse { margin-top: 28px; font-size: 0.75rem; }
+  .hero-peek { bottom: 10px; }
   .stats-bar { grid-template-columns: repeat(2, 1fr); }
   .trust-strip { gap: 20px; padding: 16px; }
   .products-grid { grid-template-columns: 1fr; }
   .testimonials-grid { grid-template-columns: 1fr; }
   .categories-grid { grid-template-columns: 1fr 1fr; }
   .footer-top { grid-template-columns: 1fr; }
-  .section { padding: 64px 20px; }
+  .section { padding: 48px 20px; }
+  .products-section { padding-top: 32px; }
   .pwa-nav { display: block; }
   body { padding-bottom: calc(56px + env(safe-area-inset-bottom)); }
   .newsletter-form { flex-direction: column; }
@@ -1136,6 +1158,16 @@ footer {
   .gallery-title { font-size: 1.2rem; }
   .gallery-thumbs { grid-template-columns: repeat(3, 1fr); }
   .gallery-stage.zoomed .gallery-main { min-width: 220%; }
+  .filter-row {
+    overflow-x: auto; flex-wrap: nowrap;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    margin: 0 -20px; padding-left: 20px; padding-right: 20px;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip { flex-shrink: 0; scroll-snap-align: start; }
   nav,
   .cart-overlay,
   .modal-overlay,
@@ -1157,6 +1189,10 @@ footer {
     opacity: 1;
     transform: none;
   }
+}
+@media (pointer: coarse) {
+  *, *::before, *::after { cursor: auto !important; }
+  #cursor, #cursor-ring { display: none !important; }
 }
 @media (max-width: 480px) {
   nav { padding: 0 16px; }
@@ -1238,10 +1274,10 @@ footer {
 <nav id="mainNav">
   <a href="index.html" class="nav-logo">Virtue <span>&</span> Vitality</a>
   <ul class="nav-links" id="navLinks">
-    <li><a href="#shop">Shop</a></li>
-    <li><a href="#categories">Collections</a></li>
-    <li><a href="#about">Mission</a></li>
-    <li><a href="#community">Community</a></li>
+    <li><a href="#shop" onclick="document.getElementById('navLinks').classList.remove('open')">Shop</a></li>
+    <li><a href="#categories" onclick="document.getElementById('navLinks').classList.remove('open')">Collections</a></li>
+    <li><a href="#about" onclick="document.getElementById('navLinks').classList.remove('open')">Mission</a></li>
+    <li><a href="#community" onclick="document.getElementById('navLinks').classList.remove('open')">Community</a></li>
     <li><a href="admin.html" style="color:var(--gold)">Admin ↗</a></li>
   </ul>
   <div class="nav-actions">
@@ -1270,6 +1306,29 @@ footer {
     <button class="btn-xl btn-xl-gold" onclick="document.getElementById('pif-section').scrollIntoView({behavior:'smooth'})">Pay it Forward ✦</button>
   </div>
   <p class="hero-verse">"Do you not know that your bodies are temples of the Holy Spirit?" — 1 Corinthians 6:19</p>
+  <div class="hero-peek" aria-hidden="true">
+    <span>Shop below</span>
+    <span class="hero-peek-arrow"></span>
+  </div>
+</section>
+
+<!-- Products -->
+<main id="main-content">
+<section class="section products-section" id="shop">
+  <div class="products-header">
+    <div>
+      <p class="section-label reveal">Featured Products</p>
+      <h2 class="section-title reveal">Curated for <em>Your Journey</em></h2>
+      <div class="filter-row reveal" id="filterRow">
+        <button class="filter-chip active" onclick="filterProducts('all',this)">All</button>
+        <button class="filter-chip" onclick="filterProducts('apparel',this)">Apparel</button>
+        <button class="filter-chip" onclick="filterProducts('digital',this)">Digital</button>
+        <button class="filter-chip" onclick="filterProducts('devotional',this)">Devotionals</button>
+        <button class="filter-chip" onclick="filterProducts('accessories',this)">Accessories</button>
+      </div>
+    </div>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
 </section>
 
 <!-- Stats Bar -->
@@ -1305,24 +1364,6 @@ footer {
 <div class="marquee">
   <div class="marquee-track" id="marqueeTrack"></div>
 </div>
-
-<!-- Products -->
-<section class="section products-section" id="shop" id="main-content">
-  <div class="products-header">
-    <div>
-      <p class="section-label reveal">Featured Products</p>
-      <h2 class="section-title reveal">Curated for <em>Your Journey</em></h2>
-      <div class="filter-row reveal" id="filterRow">
-        <button class="filter-chip active" onclick="filterProducts('all',this)">All</button>
-        <button class="filter-chip" onclick="filterProducts('apparel',this)">Apparel</button>
-        <button class="filter-chip" onclick="filterProducts('digital',this)">Digital</button>
-        <button class="filter-chip" onclick="filterProducts('devotional',this)">Devotionals</button>
-        <button class="filter-chip" onclick="filterProducts('accessories',this)">Accessories</button>
-      </div>
-    </div>
-  </div>
-  <div class="products-grid reveal" id="productsGrid"></div>
-</section>
 
 <!-- PIF Banner -->
 <div class="pif-banner" id="pif-section">
@@ -1448,6 +1489,8 @@ footer {
     <p class="newsletter-note">No spam, ever. Unsubscribe anytime.</p>
   </div>
 </section>
+
+</main>
 
 <!-- Footer -->
 <footer id="footer">
@@ -2064,23 +2107,32 @@ async function refreshProductsFromSharedStore() {
 }
 
 /* ─── INIT ─── */
-window.addEventListener('DOMContentLoaded', async () => {
-  await initializeProductsStore();
+window.addEventListener('DOMContentLoaded', () => {
+  // 1. RENDERIZAR PRODUTOS IMEDIATAMENTE com DEFAULT_PRODUCTS
+  //    Garante que o grid nunca fica vazio, mesmo se window.storage falhar
   renderProducts('all');
   initLazyImages();
-  setTimeout(() => {
-    buildMarquee();
-  }, 0);
-  setTimeout(async () => {
-    await updatePifStat();
-  }, 0);
+  buildMarquee();
+
+  // 2. HIDRATAR em background: tenta ler do storage e atualiza se houver dados
+  (async () => {
+    try {
+      await initializeProductsStore();
+      renderProducts('all');
+      initLazyImages();
+    } catch (err) {
+      console.warn('[V&V] Storage unavailable, using defaults:', err);
+    }
+    try { await updatePifStat(); } catch {}
+  })();
 });
 window.addEventListener('storage', syncPifFromStorage);
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) refreshProductsFromSharedStore();
+  if (!document.hidden) refreshProductsFromSharedStore().catch(()=>{});
 });
 window.addEventListener('keydown', (event) => {
-  if (!document.getElementById('galleryOverlay').classList.contains('open')) return;
+  const gallery = document.getElementById('galleryOverlay');
+  if (!gallery || !gallery.classList.contains('open')) return;
   if (event.key === 'Escape') closeProductGallery();
   if (event.key === 'ArrowLeft') changeGallerySlide(-1);
   if (event.key === 'ArrowRight') changeGallerySlide(1);
