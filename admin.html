@@ -614,9 +614,19 @@ const DEFAULT_PRODUCTS = [
   { id:'one-day-journal', name:'One Day at a Time Journal', cat:'devotional', price:20, emoji:'', tag:'new', verse:'Fitness, diet, self-care, and weight-loss journal for Christians.', mediaUrl:'images/IMG_4619.jpeg', mediaUrls:['images/IMG_4619.jpeg'], active:true },
   { id:'bodyweight-program', name:'Bodyweight Workout Program', cat:'digital', price:27, emoji:'', tag:'digital', verse:'No gym needed. Train your temple anywhere, anytime.', mediaUrl:'images/IMG_4620.jpeg', mediaUrls:['images/IMG_4620.jpeg'], active:true },
   { id:'dcul-womens', name:"DC-UL 1.0 — Women's Edition", cat:'digital', price:39, emoji:'', tag:'digital', verse:'Optimized 8-Week Upper/Lower Program by Derek Charlebois.', mediaUrl:'images/IMG_4621.jpeg', mediaUrls:['images/IMG_4621.jpeg'], active:true },
+  { id:'personal-trainer', name:'Faith-Led Training Plan', cat:'digital', price:49, emoji:'', tag:'coaching', verse:'Personal training for body, mind, and spirit. Rooted in Scripture and built for consistency.', mediaUrl:'images/products/training-bible-hero.png', mediaUrls:['images/products/training-bible-hero.png'], active:true },
+  { id:'hydrate-purpose-bottle', name:'Hydrate With Purpose Bottle', cat:'accessories', price:32, emoji:'', tag:'new', verse:'24oz double-wall stainless steel bottle. Strong in body, rooted in Christ.', mediaUrl:'images/products/hydrate-purpose-bottle.png', mediaUrls:['images/products/hydrate-purpose-bottle.png'], active:true },
+  { id:'devotion-box-set', name:'Made to Honor Him Box Set', cat:'apparel', price:78, emoji:'', tag:'new', verse:'Faith Fuels Everything tee with mission packaging for activewear with purpose.', mediaUrl:'images/products/devotion-box-set.png', mediaUrls:['images/products/devotion-box-set.png','images/products/devotion-box-set-alt.png'], active:true },
+  { id:'be-still-training-set', name:'Be Still Training Set', cat:'apparel', price:64, emoji:'', tag:'new', verse:'Neutral tank, bottle, and devotional pairing for disciplined mornings.', mediaUrl:'images/products/be-still-training-set.png', mediaUrls:['images/products/be-still-training-set.png'], active:true },
+  { id:'made-to-honor-tote', name:'Made to Honor Him Tote', cat:'accessories', price:28, emoji:'', tag:'', verse:'Canvas carryall for gym, Bible study, and everyday mission.', mediaUrl:'images/products/made-to-honor-tote.png', mediaUrls:['images/products/made-to-honor-tote.png'], active:true },
+  { id:'devotion-training-set', name:'Discipline & Devotion Set', cat:'apparel', price:68, emoji:'', tag:'new', verse:'Performance essentials with Scripture-led discipline for training days.', mediaUrl:'images/products/devotion-training-set.png', mediaUrls:['images/products/devotion-training-set.png'], active:true },
+  { id:'digital-faith-program', name:'Faith Fuels Everything Digital Program', cat:'digital', price:39, emoji:'', tag:'digital', verse:'Digital training guide with faith-first mindset, movement, and devotion prompts.', mediaUrl:'images/products/digital-faith-program.png', mediaUrls:['images/products/digital-faith-program.png'], active:true },
+  { id:'pay-it-forward-set', name:'Pay It Forward Generosity Set', cat:'accessories', price:52, emoji:'', tag:'pif', verse:'Every purchase blesses the next woman through the blessing bank.', mediaUrl:'images/products/pay-it-forward-set.png', mediaUrls:['images/products/pay-it-forward-set.png'], active:true },
+  { id:'faithful-stewardship-digital', name:'Faithful Stewardship Growth Guide', cat:'digital', price:27, emoji:'', tag:'digital', verse:'Sustainable growth guide for mission-led entrepreneurs and faithful stewardship.', mediaUrl:'images/products/faithful-stewardship-digital.png', mediaUrls:['images/products/faithful-stewardship-digital.png'], active:true },
+  { id:'glory-bottle-cap', name:'Every Rep His Glory Bottle + Cap', cat:'accessories', price:36, emoji:'', tag:'new', verse:'Outdoor-ready bottle and cap set: every rep, every breath, for His glory.', mediaUrl:'images/products/glory-bottle-cap.png', mediaUrls:['images/products/glory-bottle-cap.png'], active:true },
 ];
 const PRODUCT_STORAGE_KEY = 'vv_products';
-const PRODUCT_MIGRATION_KEY = 'vv_products_global_v2';
+const PRODUCT_MIGRATION_KEY = 'vv_products_global_v3';
 const REMOVED_PRODUCT_IDS = new Set([
   'grace-leggings',
   'renew-devotional',
@@ -640,7 +650,12 @@ function normalizeProduct(product) {
 }
 
 function migrateProducts(products) {
-  return products
+  const sourceProducts = Array.isArray(products) && products.length ? products : DEFAULT_PRODUCTS;
+  const existingIds = new Set(sourceProducts.map(product => product.id));
+  return [
+    ...sourceProducts,
+    ...DEFAULT_PRODUCTS.filter(product => !existingIds.has(product.id)),
+  ]
     .filter(product => !REMOVED_PRODUCT_IDS.has(product.id))
     .map(product => normalizeProduct({ ...product, emoji: '' }));
 }
