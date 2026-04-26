@@ -295,7 +295,7 @@ a{text-decoration:none;color:inherit}
 /* ─── PIF MANAGER ─── */
 .pif-manager{background:var(--black-2);border:1px solid rgba(122,158,126,0.2);padding:24px;margin-bottom:28px}
 .pif-manager-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.pif-pool-display{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.06)}
+.pif-pool-display{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:rgba(255,255,255,0.06)}
 .pif-pool-item{background:var(--black-3);padding:16px;text-align:center}
 .pif-pool-val{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--sage)}
 .pif-pool-lbl{font-size:0.68rem;color:var(--grey-4);margin-top:2px;letter-spacing:0.08em;text-transform:uppercase}
@@ -387,7 +387,7 @@ a{text-decoration:none;color:inherit}
   .drawer{width:100vw}
   .drawer-head,.drawer-body,.drawer-foot{padding-left:18px;padding-right:18px}
   .form-row{grid-template-columns:1fr}
-  .pif-pool-display{grid-template-columns:1fr 1fr 1fr}
+  .pif-pool-display{grid-template-columns:1fr 1fr}
   .pif-manager{padding:18px}
   .pif-manager-head{align-items:flex-start;flex-direction:column;gap:12px}
   .confirm-box{width:calc(100vw - 36px)}
@@ -538,6 +538,8 @@ a{text-decoration:none;color:inherit}
           </div>
           <div class="pif-pool-display">
             <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalCredits">$0</div><div class="pif-pool-lbl">Available</div></div>
+            <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalRaised">$0</div><div class="pif-pool-lbl">Raised</div></div>
+            <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalBlessed">$0</div><div class="pif-pool-lbl">Blessed</div></div>
             <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalGiven">0</div><div class="pif-pool-lbl">Gifts Given</div></div>
             <div class="pif-pool-item"><div class="pif-pool-val" id="pifTotalUsed">0</div><div class="pif-pool-lbl">Times Used</div></div>
           </div>
@@ -731,11 +733,32 @@ async function setPifCredits(v) {
   localStorage.setItem('vv_pif', String(v));
   await updatePifDisplay();
 }
+async function getPifMetric(storageKey, localKey, fallback = 0) {
+  try {
+    const r = await window.storage.get(storageKey);
+    if (r?.value !== undefined) return parseFloat(r.value) || 0;
+  } catch {}
+  return parseFloat(localStorage.getItem(localKey) || String(fallback)) || 0;
+}
+async function setPifMetric(storageKey, localKey, value) {
+  const normalizedValue = Math.max(0, Number(value) || 0);
+  try { await window.storage.set(storageKey, String(normalizedValue), true); } catch {}
+  localStorage.setItem(localKey, String(normalizedValue));
+  return normalizedValue;
+}
+async function incrementPifMetric(storageKey, localKey, amount, fallback = 0) {
+  const currentValue = await getPifMetric(storageKey, localKey, fallback);
+  return setPifMetric(storageKey, localKey, currentValue + Math.max(0, Number(amount) || 0));
+}
 async function updatePifDisplay() {
   const credits = await getPifCredits();
   const count = await getPifCount();
   const used = await getPifUsed();
+  const raised = await getPifMetric('pif_total_raised', 'vv_pif_total_raised', 2847);
+  const blessed = await getPifMetric('pif_total_blessed', 'vv_pif_total_blessed', 0);
   document.getElementById('pifTotalCredits').textContent = '$'+credits.toFixed(2);
+  document.getElementById('pifTotalRaised').textContent = '$'+raised.toFixed(2);
+  document.getElementById('pifTotalBlessed').textContent = '$'+blessed.toFixed(2);
   document.getElementById('pifTotalGiven').textContent = count;
   document.getElementById('pifTotalUsed').textContent = used;
   document.getElementById('sidebarPifVal').textContent = '$'+credits.toFixed(2);
@@ -1002,6 +1025,7 @@ async function confirmAddCredit() {
   if (!amt || amt <= 0) { notify('Enter a valid amount', 'error'); return; }
   const cur = await getPifCredits();
   await setPifCredits(cur + amt);
+  await incrementPifMetric('pif_total_raised', 'vv_pif_total_raised', amt, 2847);
   pifLog.push({ type: 'add', amount: amt, note, time: new Date().toLocaleTimeString() });
   updatePifLog();
   document.getElementById('addCreditModal').style.display = 'none';
@@ -1018,7 +1042,7 @@ async function resetPifCredits() {
 }
 
 function syncPifDisplay(event) {
-  if (event && !['vv_pif', 'vv_pif_count', 'vv_pif_used'].includes(event.key)) return;
+  if (event && !['vv_pif', 'vv_pif_count', 'vv_pif_used', 'vv_pif_total_raised', 'vv_pif_total_blessed'].includes(event.key)) return;
   updatePifDisplay();
 }
 

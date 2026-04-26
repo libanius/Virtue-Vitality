@@ -907,27 +907,64 @@ body::before {
   letter-spacing: 0.04em;
 }
 .pif__bank {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
   padding: 14px 22px;
   background: var(--olive-tint);
   border: 1px solid rgba(107,106,76,0.2);
   border-radius: var(--r-xs);
   margin-top: 8px;
+  max-width: 560px;
 }
-.pif__bank-label {
+.pif__bank-stat {
+  min-width: 0;
+  padding: 0 14px;
+  border-left: 1px solid rgba(107,106,76,0.16);
+}
+.pif__bank-stat:first-child {
+  border-left: 0;
+  padding-left: 0;
+}
+.pif__bank-label,
+.pif__bank-note {
+  display: block;
   font-size: 10px;
-  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--olive-green);
   font-weight: 500;
 }
+.pif__bank-label {
+  letter-spacing: 0.22em;
+}
+.pif__bank-note {
+  margin-top: 2px;
+  letter-spacing: 0.12em;
+  opacity: 0.72;
+}
 .pif__bank-amount {
+  display: block;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: 18px;
+  font-size: clamp(22px, 4vw, 34px);
+  line-height: 1.05;
   color: var(--charcoal);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 640px) {
+  .pif__bank {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+  .pif__bank-stat {
+    border-left: 0;
+    border-top: 1px solid rgba(107,106,76,0.16);
+    padding: 14px 0 0;
+  }
+  .pif__bank-stat:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
 }
 
 /* ============================================================
@@ -2416,9 +2453,22 @@ footer {
           </div>
         </div>
 
-        <div class="pif__bank">
-          <span class="pif__bank-label">Blessing Bank</span>
-          <span class="pif__bank-amount" id="pifAmount">$2,847</span>
+        <div class="pif__bank" id="pifBankStats" aria-label="Blessing Bank historical impact">
+          <div class="pif__bank-stat">
+            <span class="pif__bank-label">Raised</span>
+            <span class="pif__bank-amount" id="pifAmount" data-count-currency>$2,847</span>
+            <span class="pif__bank-note">all time</span>
+          </div>
+          <div class="pif__bank-stat">
+            <span class="pif__bank-label">Blessed</span>
+            <span class="pif__bank-amount" id="pifBlessedAmount" data-count-currency>$0</span>
+            <span class="pif__bank-note">covered orders</span>
+          </div>
+          <div class="pif__bank-stat">
+            <span class="pif__bank-label">Available</span>
+            <span class="pif__bank-amount" id="pifAvailableAmount" data-count-currency>$0</span>
+            <span class="pif__bank-note">ready to give</span>
+          </div>
         </div>
       </div>
     </div>
@@ -2958,6 +3008,7 @@ footer {
 
   // ─── Checkout ───
   const ORDER_STORAGE_KEY = 'vv_orders';
+  const PIF_INITIAL_RAISED = 2847;
   const checkoutModal = document.getElementById('checkoutModal');
   const checkoutBackdrop = document.getElementById('checkoutBackdrop');
   const checkoutBody = document.getElementById('checkoutBody');
@@ -3289,8 +3340,77 @@ footer {
     localStorage.setItem('vv_pif', String(value));
   }
 
+  async function getPifMetric(storageKey, localKey, fallback = 0) {
+    try {
+      const record = await window.storage?.get(storageKey);
+      if (record?.value !== undefined) return parseFloat(record.value) || 0;
+    } catch {}
+    return parseFloat(localStorage.getItem(localKey) || String(fallback)) || 0;
+  }
+
+  async function setPifMetric(storageKey, localKey, value) {
+    const normalizedValue = Math.max(0, Number(value) || 0);
+    try { await window.storage?.set(storageKey, String(normalizedValue), true); } catch {}
+    localStorage.setItem(localKey, String(normalizedValue));
+    return normalizedValue;
+  }
+
+  async function incrementPifMetric(storageKey, localKey, amount, fallback = 0) {
+    const currentValue = await getPifMetric(storageKey, localKey, fallback);
+    return setPifMetric(storageKey, localKey, currentValue + Math.max(0, Number(amount) || 0));
+  }
+
+  const formatWholeMoney = (value) => `$${Math.round(Number(value) || 0).toLocaleString('en-US')}`;
+
+  const setCountTarget = (element, value) => {
+    if (!element) return;
+    const targetValue = Math.max(0, Number(value) || 0);
+    element.dataset.countTarget = String(targetValue);
+    element.dataset.countCurrent = '0';
+    element.textContent = formatWholeMoney(0);
+  };
+
+  const animateCount = (element, targetValue) => {
+    if (!element) return;
+    const target = Math.max(0, Number(targetValue) || 0);
+    const start = Math.max(0, Number(element.dataset.countCurrent) || 0);
+    const duration = 950;
+    const startTime = performance.now();
+    element.dataset.countCurrent = String(target);
+
+    const step = (now) => {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      element.textContent = formatWholeMoney(start + ((target - start) * eased));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+
+    requestAnimationFrame(step);
+  };
+
+  async function updatePifBankStats({ animate = false } = {}) {
+    const [available, raised, blessed] = await Promise.all([
+      getPifCredits(),
+      getPifMetric('pif_total_raised', 'vv_pif_total_raised', PIF_INITIAL_RAISED),
+      getPifMetric('pif_total_blessed', 'vv_pif_total_blessed', 0),
+    ]);
+
+    const stats = [
+      [document.getElementById('pifAmount'), Math.max(raised, PIF_INITIAL_RAISED)],
+      [document.getElementById('pifBlessedAmount'), blessed],
+      [document.getElementById('pifAvailableAmount'), available],
+    ];
+
+    const bankAlreadyCounted = document.getElementById('pifBankStats')?.classList.contains('counted');
+    stats.forEach(([element, value]) => {
+      if (animate && bankAlreadyCounted) animateCount(element, value);
+      else setCountTarget(element, value);
+    });
+  }
+
   async function addPifGift(amount) {
     await setPifCredits((await getPifCredits()) + amount);
+    await incrementPifMetric('pif_total_raised', 'vv_pif_total_raised', amount, PIF_INITIAL_RAISED);
     try {
       const record = await window.storage?.get('pif_count');
       const count = (record ? parseInt(record.value) : parseInt(localStorage.getItem('vv_pif_count') || '0')) + 1;
@@ -3299,10 +3419,12 @@ footer {
     } catch {
       localStorage.setItem('vv_pif_count', String(parseInt(localStorage.getItem('vv_pif_count') || '0') + 1));
     }
+    updatePifBankStats({ animate: true });
   }
 
   async function usePifGift(amount) {
     await setPifCredits(Math.max(0, (await getPifCredits()) - amount));
+    await incrementPifMetric('pif_total_blessed', 'vv_pif_total_blessed', amount, 0);
     try {
       const record = await window.storage?.get('pif_used');
       const used = (record ? parseInt(record.value) : parseInt(localStorage.getItem('vv_pif_used') || '0')) + 1;
@@ -3311,6 +3433,7 @@ footer {
     } catch {
       localStorage.setItem('vv_pif_used', String(parseInt(localStorage.getItem('vv_pif_used') || '0') + 1));
     }
+    updatePifBankStats({ animate: true });
   }
 
   const saveOrder = (order) => {
@@ -3476,6 +3599,24 @@ footer {
     document.querySelectorAll('.reveal:not(.in)').forEach(el => observer.observe(el));
   };
 
+  let pifBankObserver;
+  const observePifBankStats = () => {
+    const bank = document.getElementById('pifBankStats');
+    if (!bank) return;
+    if (pifBankObserver) pifBankObserver.disconnect();
+    pifBankObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        bank.querySelectorAll('[data-count-target]').forEach(element => {
+          animateCount(element, element.dataset.countTarget);
+        });
+        bank.classList.add('counted');
+        pifBankObserver.unobserve(bank);
+      });
+    }, { threshold: 0.35 });
+    pifBankObserver.observe(bank);
+  };
+
   // ─── Newsletter ───
   document.getElementById('newsletterForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -3492,12 +3633,16 @@ footer {
 
   window.addEventListener('storage', (event) => {
     if (event.key === PRODUCT_STORAGE_KEY) refreshCatalog();
+    if (['vv_pif', 'vv_pif_total_raised', 'vv_pif_total_blessed'].includes(event.key)) {
+      updatePifBankStats({ animate: true });
+    }
   });
 
   // ─── Init ───
   refreshCatalog();
   renderCart();
   observeReveals();
+  updatePifBankStats().then(observePifBankStats);
 })();
 </script>
 
