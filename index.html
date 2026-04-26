@@ -1824,6 +1824,27 @@ footer {
   text-transform: uppercase;
   font-weight: 600;
 }
+.checkout__pif-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+.checkout__pif-option {
+  border: 1px solid var(--line);
+  border-radius: var(--r-xs);
+  padding: 12px 8px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 600;
+  transition: border-color 0.25s, color 0.25s, background 0.25s;
+}
+.checkout__pif-option:hover,
+.checkout__pif-option.active {
+  border-color: var(--deep-olive);
+  background: var(--cream);
+  color: var(--deep-olive);
+}
 
 /* ============================================================
    TOAST
@@ -2056,6 +2077,9 @@ footer {
   }
   .checkout__button {
     width: 100%;
+  }
+  .checkout__pif-options {
+    grid-template-columns: repeat(2, 1fr);
   }
   .toast {
     bottom: calc(92px + env(safe-area-inset-bottom));
@@ -2900,6 +2924,8 @@ footer {
   const checkoutSteps = ['Cadastro', 'Shipment', 'Payment', 'Review'];
   let checkoutStep = 0;
   let checkoutOrderId = '';
+  let giftCreditApplied = 0;
+  let pifContribution = 0;
   const checkoutData = {
     contact: {},
     shipping: { country: 'United States', shippingMethod: 'standard' },
@@ -2918,9 +2944,11 @@ footer {
   const cartSubtotal = () => cartItems().reduce((sum, item) => sum + item.price * item.qty, 0);
   const checkoutTotals = () => {
     const subtotal = cartSubtotal();
-    const pif = pifChecked ? 5 : 0;
+    const pif = pifChecked ? 5 : pifContribution;
     const shipping = checkoutData.shipping.shippingMethod === 'express' ? 8 : 0;
-    return { subtotal, pif, shipping, total: subtotal + pif + shipping };
+    const beforeGift = subtotal + pif + shipping;
+    const gift = Math.min(giftCreditApplied, beforeGift);
+    return { subtotal, pif, shipping, gift, total: Math.max(0, beforeGift - gift) };
   };
 
   const checkoutStepsHTML = () => `
@@ -2948,6 +2976,7 @@ footer {
         <div class="checkout__line"><span>Subtotal</span><span>${money(totals.subtotal)}</span></div>
         <div class="checkout__line"><span>Pay it Forward</span><span>${money(totals.pif)}</span></div>
         <div class="checkout__line"><span>Shipping</span><span>${totals.shipping ? money(totals.shipping) : 'Free'}</span></div>
+        ${totals.gift ? `<div class="checkout__line"><span>Blessing Bank Gift</span><span>-${money(totals.gift)}</span></div>` : ''}
         <div class="checkout__line total"><span>Total</span><span>${money(totals.total)}</span></div>
         <p class="checkout__note">Payment is validated in this static checkout. Connect Stripe or PayPal before accepting real charges.</p>
       </aside>
@@ -3091,7 +3120,24 @@ footer {
             </div>
             <div class="checkout__summary">
               <div class="checkout__summary-title">Payment</div>
-              <div class="checkout__line"><span>${escapeHTML(payment.cardName)}</span><span>Card ending ${escapeHTML(payment.last4)}</span></div>
+              ${payment.last4
+                ? `<div class="checkout__line"><span>${escapeHTML(payment.cardName)}</span><span>Card ending ${escapeHTML(payment.last4)}</span></div>`
+                : `<div class="checkout__line"><span>Blessing Bank</span><span>Covered by gift</span></div>`}
+            </div>
+            <div class="checkout__summary" style="margin-top:16px">
+              <div class="checkout__summary-title">Pay it Forward</div>
+              <p class="checkout__note" style="margin-top:0">Would you like to bless the next person by adding a gift to the blessing bank?</p>
+              <div class="checkout__pif-options" role="radiogroup" aria-label="Pay it Forward contribution">
+                ${[0, 5, 10, 25].map(amount => `
+                  <button class="checkout__pif-option ${pifContribution === amount ? 'active' : ''}" type="button" data-pif-amount="${amount}">
+                    ${amount ? money(amount) : 'No gift'}
+                  </button>
+                `).join('')}
+              </div>
+              <div class="checkout__field" style="margin-top:14px;margin-bottom:0">
+                <label for="pifCustom">Custom gift</label>
+                <input id="pifCustom" name="pifCustom" type="number" min="1" step="1" placeholder="Enter amount" data-pif-custom>
+              </div>
             </div>
             <div class="checkout__actions">
               <button class="checkout__button secondary" type="button" data-checkout-back>Back</button>
@@ -3104,19 +3150,33 @@ footer {
     }
   };
 
-  const openCheckout = () => {
+  const openCheckout = async () => {
     if (cartItems().length === 0) {
       showToast('Add a product before checkout');
       openDrawer();
       return;
     }
     checkoutStep = 0;
+    pifContribution = pifChecked ? 5 : 0;
+    giftCreditApplied = 0;
+    checkoutData.contact = {};
+    checkoutData.shipping = { country: 'United States', shippingMethod: 'standard' };
+    checkoutData.payment = {};
+    pifChecked = false;
+    document.getElementById('pifToggle').checked = false;
+    renderCart();
     closeDrawer();
     checkoutModal.classList.add('open');
     checkoutBackdrop.classList.add('open');
     checkoutModal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
-    renderCheckout();
+    const availableCredit = await getPifCredits();
+    const orderTotal = checkoutTotals().subtotal + checkoutTotals().shipping;
+    if (availableCredit >= orderTotal && orderTotal > 0) {
+      showBlessingGift(orderTotal, availableCredit);
+    } else {
+      renderCheckout();
+    }
   };
 
   const closeCheckout = () => {
@@ -3124,6 +3184,19 @@ footer {
     checkoutBackdrop.classList.remove('open');
     checkoutModal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+  };
+
+  const showBlessingGift = (amount) => {
+    checkoutTitle.textContent = 'A Gift for You';
+    checkoutBody.innerHTML = `
+      <div class="checkout__success">
+        <span class="checkout__success-code">Blessing Bank</span>
+        <h3>You were blessed.</h3>
+        <p>A stranger left a Pay it Forward credit in the blessing bank. Your selected order has been covered with a ${money(amount)} gift from this community.</p>
+        <p class="checkout__note" style="max-width:440px;margin:0 auto 22px">Continue through cadastro and shipment so the order can be saved. You will still have the option to bless someone else before confirming.</p>
+        <button class="checkout__button primary" type="button" data-accept-gift="${amount}">Accept Gift</button>
+      </div>
+    `;
   };
 
   const collectCheckoutStep = () => {
@@ -3187,6 +3260,18 @@ footer {
     }
   }
 
+  async function usePifGift(amount) {
+    await setPifCredits(Math.max(0, (await getPifCredits()) - amount));
+    try {
+      const record = await window.storage?.get('pif_used');
+      const used = (record ? parseInt(record.value) : parseInt(localStorage.getItem('vv_pif_used') || '0')) + 1;
+      await window.storage?.set('pif_used', String(used), true);
+      localStorage.setItem('vv_pif_used', String(used));
+    } catch {
+      localStorage.setItem('vv_pif_used', String(parseInt(localStorage.getItem('vv_pif_used') || '0') + 1));
+    }
+  }
+
   const saveOrder = (order) => {
     try {
       const orders = JSON.parse(localStorage.getItem(ORDER_STORAGE_KEY) || '[]');
@@ -3199,6 +3284,12 @@ footer {
 
   const completeCheckout = async () => {
     const totals = checkoutTotals();
+    if (totals.total > 0 && !checkoutData.payment.last4) {
+      showToast('Payment is needed for the remaining total');
+      checkoutStep = 2;
+      renderCheckout();
+      return;
+    }
     checkoutOrderId = `VV-${Date.now().toString().slice(-6)}`;
     const order = {
       id: checkoutOrderId,
@@ -3212,15 +3303,23 @@ footer {
       })),
       contact: { ...checkoutData.contact, password: checkoutData.contact.password ? '[created]' : '' },
       shipping: checkoutData.shipping,
-      payment: checkoutData.payment,
+      payment: totals.total > 0 ? checkoutData.payment : { method: 'Blessing Bank', last4: 'gift' },
       totals,
+      blessingBank: {
+        covered: giftCreditApplied,
+        contributed: pifChecked ? 5 : pifContribution,
+      },
     };
 
     saveOrder(order);
+    if (giftCreditApplied) await usePifGift(giftCreditApplied);
     if (pifChecked) await addPifGift(5);
+    else if (pifContribution) await addPifGift(pifContribution);
 
     cart.clear();
     pifChecked = false;
+    pifContribution = 0;
+    giftCreditApplied = 0;
     document.getElementById('pifToggle').checked = false;
     renderCart();
 
@@ -3238,7 +3337,11 @@ footer {
   checkoutBody.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!collectCheckoutStep()) return;
-    checkoutStep = Math.min(checkoutStep + 1, checkoutSteps.length - 1);
+    if (checkoutStep === 1 && checkoutTotals().total === 0) {
+      checkoutStep = 3;
+    } else {
+      checkoutStep = Math.min(checkoutStep + 1, checkoutSteps.length - 1);
+    }
     renderCheckout();
   });
 
@@ -3246,18 +3349,40 @@ footer {
     const target = event.target.closest('button');
     if (!target) return;
     if (target.matches('[data-checkout-back]')) {
-      checkoutStep = Math.max(checkoutStep - 1, 0);
+      checkoutStep = checkoutStep === 3 && giftCreditApplied && !checkoutData.payment.last4 ? 1 : Math.max(checkoutStep - 1, 0);
       renderCheckout();
     } else if (target.matches('[data-place-order]')) {
       await completeCheckout();
     } else if (target.matches('[data-checkout-close]')) {
       closeCheckout();
+    } else if (target.matches('[data-accept-gift]')) {
+      const amount = parseFloat(target.dataset.acceptGift || '0');
+      if (amount > 0) {
+        giftCreditApplied = amount;
+      }
+      checkoutStep = 0;
+      renderCheckout();
+    } else if (target.matches('[data-pif-amount]')) {
+      pifContribution = parseFloat(target.dataset.pifAmount || '0');
+      document.querySelectorAll('[data-pif-amount]').forEach(button => button.classList.toggle('active', button === target));
+      const custom = document.querySelector('[data-pif-custom]');
+      if (custom) custom.value = '';
+      const summary = document.getElementById('checkoutSummary');
+      if (summary) summary.outerHTML = checkoutSummaryHTML();
     }
   });
 
   checkoutBody.addEventListener('change', (event) => {
     if (event.target.name !== 'shippingMethod') return;
     checkoutData.shipping.shippingMethod = event.target.value;
+    const summary = document.getElementById('checkoutSummary');
+    if (summary) summary.outerHTML = checkoutSummaryHTML();
+  });
+
+  checkoutBody.addEventListener('input', (event) => {
+    if (!event.target.matches('[data-pif-custom]')) return;
+    pifContribution = Math.max(0, parseFloat(event.target.value || '0') || 0);
+    document.querySelectorAll('[data-pif-amount]').forEach(button => button.classList.remove('active'));
     const summary = document.getElementById('checkoutSummary');
     if (summary) summary.outerHTML = checkoutSummaryHTML();
   });
