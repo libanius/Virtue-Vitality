@@ -1623,13 +1623,20 @@ footer {
   letter-spacing: 0.04em;
   font-weight: 500;
   z-index: 110;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s, box-shadow 0.4s;
   box-shadow: 0 12px 40px rgba(15,15,15,0.2);
   display: inline-flex;
   align-items: center;
   gap: 12px;
 }
 .toast.show { transform: translateX(-50%) translateY(0); }
+.toast.show:hover,
+.toast.show:focus-within {
+  bottom: 50%;
+  transform: translateX(-50%) translateY(50%) scale(1.04);
+  padding: 20px 32px;
+  box-shadow: 0 24px 80px rgba(15,15,15,0.28);
+}
 .toast::before {
   content: '✣';
   color: var(--soft-gold);
@@ -1650,20 +1657,7 @@ footer {
   border-radius: 24px 24px 0 0;
   transform: translateY(0);
   transform-origin: bottom center;
-  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.36s, background 0.36s, border-radius 0.36s;
-}
-.bottom-nav:hover,
-.bottom-nav:focus-within {
-  left: 50%;
-  right: auto;
-  width: min(420px, calc(100vw - 32px));
-  bottom: 50%;
-  transform: translate(-50%, 50%);
-  background: rgba(250, 247, 242, 0.98);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  box-shadow: 0 24px 70px rgba(15,15,15,0.18);
-  padding: 16px;
+  transition: transform 0.36s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.36s, background 0.36s;
 }
 .bottom-nav__items {
   display: flex;
@@ -1688,16 +1682,6 @@ footer {
   letter-spacing: 0.04em;
   font-weight: 500;
   line-height: 1.2;
-}
-.bottom-nav:hover .bottom-nav__item,
-.bottom-nav:focus-within .bottom-nav__item {
-  min-width: 72px;
-  padding: 10px 12px;
-}
-.bottom-nav:hover .bottom-nav__item svg,
-.bottom-nav:focus-within .bottom-nav__item svg {
-  width: 22px;
-  height: 22px;
 }
 
 /* ============================================================
@@ -2649,6 +2633,10 @@ footer {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
   };
+  toast.addEventListener('mouseenter', () => clearTimeout(toastTimer));
+  toast.addEventListener('mouseleave', () => {
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1200);
+  });
 
   // ─── Smooth scroll buttons ───
   document.querySelectorAll('[data-scroll]').forEach(btn => {
