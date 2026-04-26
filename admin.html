@@ -354,12 +354,53 @@ a{text-decoration:none;color:inherit}
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:900px){
-  .sidebar{left:-240px}.sidebar.mobile-open{left:0}
+  body{overflow-x:hidden}
+  .admin-layout{display:block}
+  .sidebar{
+    position:relative;top:auto;left:auto;bottom:auto;
+    width:100%;min-height:auto;
+    border-right:none;border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .sidebar-logo{padding:18px 18px 14px;margin-bottom:0}
+  .sidebar-back{padding:10px 18px;margin-bottom:4px}
+  .nav-section-title{padding:14px 18px 6px}
+  .nav-item{padding:12px 18px;min-height:44px}
+  .sidebar-bottom{display:none}
   .main{margin-left:0}
+  .topbar{
+    height:auto;min-height:56px;
+    align-items:flex-start;gap:12px;flex-direction:column;
+    padding:14px 18px;position:sticky;top:0;
+  }
+  .topbar-actions{width:100%;overflow-x:auto;padding-bottom:2px}
+  .topbar-actions .btn-sm{flex:0 0 auto}
+  .content{padding:18px}
+  .page-header{align-items:flex-start;margin-bottom:20px}
+  .page-title{font-size:1.55rem}
   .stats-row{grid-template-columns:repeat(2,1fr)}
+  .stat-card{padding:16px}
+  .table-section{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .table-head{align-items:stretch}
+  .search-bar{width:100%;display:grid;grid-template-columns:1fr;gap:8px}
+  .search-input{width:100% !important}
+  .product-table{min-width:680px}
   .drawer{width:100vw}
+  .drawer-head,.drawer-body,.drawer-foot{padding-left:18px;padding-right:18px}
   .form-row{grid-template-columns:1fr}
   .pif-pool-display{grid-template-columns:1fr 1fr 1fr}
+  .pif-manager{padding:18px}
+  .pif-manager-head{align-items:flex-start;flex-direction:column;gap:12px}
+  .confirm-box{width:calc(100vw - 36px)}
+}
+
+@media(max-width:520px){
+  .stats-row{grid-template-columns:1fr}
+  .pif-pool-display{grid-template-columns:1fr}
+  .media-grid{grid-template-columns:1fr 1fr}
+  .drawer-foot{flex-direction:column}
+  .drawer-foot .btn-sm{width:100%}
+  .confirm-actions{flex-direction:column}
+  .confirm-actions .btn-sm{width:100%}
 }
 </style>
 </head>

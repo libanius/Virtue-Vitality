@@ -275,6 +275,10 @@ body::before {
 
 .menu-toggle { display: none; }
 
+.mobile-menu {
+  display: none;
+}
+
 /* ============================================================
    HERO
    ============================================================ */
@@ -1615,9 +1619,8 @@ footer {
   color: var(--soft-cream);
   padding: 14px 28px;
   border-radius: var(--r-xs);
-  font-size: 12px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.04em;
   font-weight: 500;
   z-index: 110;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1721,13 +1724,67 @@ footer {
   .brand-mark__name { font-size: 15px; }
   .brand-mark__tag { font-size: 8px; }
 
+  .mobile-menu {
+    position: fixed;
+    top: 72px;
+    left: 0;
+    right: 0;
+    z-index: 45;
+    display: grid;
+    gap: 2px;
+    padding: 10px var(--gutter) 18px;
+    background: rgba(245, 241, 235, 0.98);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 16px 40px rgba(15,15,15,0.08);
+    transform: translateY(-16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+  .mobile-menu.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .mobile-menu a {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
   .hero { padding-top: 110px; }
+  .hero__grid { min-height: auto; gap: 34px; }
+  .hero__eyebrow { margin-bottom: 24px; }
+  .hero__title { font-size: clamp(40px, 13vw, 58px); margin-bottom: 22px; }
+  .hero__sub { font-size: 19px; margin-bottom: 26px; }
+  .hero__rooted { margin-bottom: 30px; line-height: 1.7; }
 
   .hero__cta { gap: 16px; flex-direction: column; align-items: stretch; }
   .btn { padding: 14px 24px; font-size: 10px; }
   .btn--ghost { padding: 8px 0; }
 
+  .collection__filters {
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0 var(--gutter) 4px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .collection__filters::-webkit-scrollbar { display: none; }
+  .collection__filters button { flex: 0 0 auto; }
+
   .product, .product:nth-child(n) { grid-column: span 12; }
+  .product__quick { opacity: 1; transform: none; }
+  .product__head { align-items: flex-start; }
+  .product__cat { text-align: left; }
+  .product__row { align-items: flex-start !important; gap: 10px; flex-direction: column; }
+  .product__blurb { max-width: none; }
+
+  .journal__grid { gap: 34px; }
   .footer__top { grid-template-columns: 1fr; gap: 36px; }
   .footer__bottom { font-size: 10px; }
 
@@ -1736,12 +1793,26 @@ footer {
   .bottom-nav { display: block; }
   body { padding-bottom: 70px; }
 
-  .pillars__grid { grid-template-columns: 1fr 1fr; }
+  .pillars__grid { grid-template-columns: 1fr; }
 
   .marquee__track { font-size: 14px; }
   .marquee__item { gap: 32px; padding-right: 32px; }
 
   .drawer { width: 100vw; }
+  .drawer__head,
+  .drawer__body,
+  .drawer__foot { padding-left: 20px; padding-right: 20px; }
+  .drawer__item { grid-template-columns: 68px 1fr; gap: 14px; }
+  .drawer__item img { width: 68px; height: 86px; }
+  .toast {
+    bottom: calc(92px + env(safe-area-inset-bottom));
+    width: calc(100vw - 32px);
+    justify-content: center;
+    padding-left: 18px;
+    padding-right: 18px;
+    text-align: center;
+    line-height: 1.35;
+  }
 }
 
 
@@ -1803,7 +1874,7 @@ footer {
      ============================================================ -->
 <header class="site-header" id="siteHeader">
   <div class="site-header__inner">
-    <button class="icon-btn menu-toggle" aria-label="Menu" id="menuToggle">
+    <button class="icon-btn menu-toggle" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu" id="menuToggle">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/></svg>
     </button>
     <nav class="nav-left">
@@ -1834,6 +1905,14 @@ footer {
     </nav>
   </div>
 </header>
+
+<nav class="mobile-menu" id="mobileMenu" aria-label="Mobile navigation">
+  <a href="#collection">Shop</a>
+  <a href="#digital">Devotionals</a>
+  <a href="#pif">Pay it Forward</a>
+  <a href="#journal">Journal</a>
+  <a href="#about">About</a>
+</nav>
 
 <!-- ============================================================
      HERO
@@ -2227,6 +2306,7 @@ footer {
           <li><a href="#">Returns</a></li>
           <li><a href="#">Size Guide</a></li>
           <li><a href="#">FAQ</a></li>
+          <li><a href="admin.html">Admin</a></li>
         </ul>
       </div>
     </div>
@@ -2272,7 +2352,7 @@ footer {
 <!-- ============================================================
      TOAST
      ============================================================ -->
-<div class="toast" id="toast">Added to your bag</div>
+<div class="toast" id="toast">Product added to bag</div>
 
 <!-- ============================================================
      PWA BOTTOM NAV
@@ -2377,7 +2457,7 @@ footer {
     const existing = cart.get(id);
     cart.set(id, { ...product, qty: existing ? existing.qty + 1 : 1 });
     renderCart();
-    showToast(`${product.name} · added to bag`);
+    showToast(`${product.name} added to bag`);
     openDrawer();
   };
 
@@ -2488,6 +2568,20 @@ footer {
       e.preventDefault();
       const target = document.querySelector(btn.dataset.scroll);
       if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // ─── Mobile menu ───
+  const menuToggle = document.getElementById('menuToggle');
+  const mobileMenu = document.getElementById('mobileMenu');
+  menuToggle.addEventListener('click', () => {
+    const isOpen = mobileMenu.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+  mobileMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
     });
   });
 
